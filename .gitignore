@@ -1,0 +1,11 @@
+# Generated Files
+/pdf
+/md
+/build
+/temp_combined
+
+# Python Cache
+/pycache
+
+# Local Configuration
+/config/config-company.yaml

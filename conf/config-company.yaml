@@ -1,0 +1,83 @@
+# Variables for policy documents
+company_name: "PluralFusion, Inc."
+company: "PluralFusion" # Short name
+security_officer_name: "Todd Emerson"
+security_office_email: "emerson@pluralfusion.com"
+privacy_officer_name: "Todd Emerson"
+privacy_officer_email: "emerson@pluralfusion.com"
+company_website: "https://pluralfusion.com"
+company_service: "hosted infrastructure and platforms"
+company_service_user_types: "health technology vendors, developers, designers, agencies, custom development shops, and enterprises"
+
+# PDF build metadata
+combined_pdf_title: "PluralFusion Compliance Policy Manual"
+combined_pdf_author: "Adrian Todd Emerson"
+
+show_review_committee: true
+review_committee:
+  - "Todd Emerson"
+  - "Toly Pochkin"
+
+
+# Feature Toggles
+show_internal_notes: true
+
+# Revision History Toggles
+# These control if the git log is appended to the output files
+md_show_revision_history: true
+pdf_show_revision_history: true
+combined_pdf_show_revision_history: false
+
+## Service Type Toggles
+SaaS: false # Software as a Service
+PaaS: true # Platform as a Service
+IaaS: true # Infrastructure as a Service
+BaaS: false # Backend as a Service
+Managed_Service: false
+Hosting_Service: true
+Consulting_Service: false
+Mobile_App_Service: true
+
+Other_Service: false
+Other_Service_Description: ""
+
+
+
+# Compliance Framework Toggles
+hipaa: true
+hitRUST: false
+soc2: false
+iso27001: false
+pci_dss: false
+gdpr: false
+ccpa: false
+other_frameworks: false
+other_frameworks_description: ""
+
+hipaa_audit_inprogress: false
+hipaa_audit_completed: false
+hipaa_audit_completed_date: ""
+hitRUST_audit_inprogress: true 
+hitRUST_audit_completed: false
+hitRUST_audit_certification_date: ""
+
+
+# Policy Sections Toggles
+include_access_control_policy: true
+include_audit_control_policy: true
+include_business_associate_agreement_policy: true
+include_change_management_policy: true
+include_data_backup_policy: true
+include_data_encryption_policy: true
+include_data_retention_policy: true
+include_incident_response_policy: true
+include_network_security_policy: true
+include_physical_security_policy: true
+include_privacy_policy: true
+include_risk_assessment_policy: true
+include_security_awareness_training_policy: true
+include_system_configuration_policy: true
+include_third_party_management_policy: true
+include_user_account_management_policy: true
+include_vendor_management_policy: true
+

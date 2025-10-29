@@ -1,0 +1,62 @@
+# Variables for policy documents
+company_name: "YOUR COMPANY NAME"
+company: "YourCompany" # Short name
+security_officer_name: "Jane Doe"
+security_office_email: "security@yourcompany.com"
+privacy_officer_name: "Jane Doe"
+privacy_officer_email: "privacy@yourcompany.com"
+company_website: "https://yourcompany.com"
+company_service: "YOUR SERVICE DESCRIPTION"
+company_service_user_types: "YOUR CUSTOMER TYPES"
+
+# PDF build metadata
+combined_pdf_title: "Company Policy Manual"
+combined_pdf_author: "YOUR COMPANY NAME"
+
+show_review_committee: true
+review_committee:
+  - "Jane Doe"
+  - "John Smith"
+
+
+# Feature Toggles
+show_internal_notes: true
+
+# Revision History Toggles
+# These control if the git log is appended to the output files
+md_show_revision_history: true
+pdf_show_revision_history: true
+combined_pdf_show_revision_history: false
+
+## Service Type Toggles (placeholders mostly)
+SaaS: true
+PaaS: false
+IaaS: false
+BaaS: false
+Managed_Service: false
+Hosting_Service: false
+Consulting_Service: false
+Mobile_App_Service: false
+
+Other_Service: false
+Other_Service_Description: ""
+
+
+
+# Compliance Framework Toggles
+hipaa: true
+hitRUST: false
+soc2: false
+iso27001: false
+pci_dss: false
+gdpr: false
+ccpa: false
+other_frameworks: false
+other_frameworks_description: ""
+
+hipaa_audit_inprogress: false
+hipaa_audit_completed: true
+hipaa_audit_completed_date: "YYYY-MM-DD"
+hitRUST_audit_inprogress: false
+hitRUST_audit_completed: false
+hitRUST_audit_certification_date: ""

@@ -1,0 +1,51 @@
+name: Policy Document Manager
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'policy/**.md'
+      - 'conf/**'
+
+jobs:
+  build-docs:
+    name: Build Processed Docs and PDFs
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          # Fetch full history so 'git log' works
+          fetch-depth: 0 
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pandoc texlive-latex-base texlive-fonts-recommended texlive-latex-extra
+          pip install PyYAML Jinja2
+
+      - name: Generate Git History
+        # This new step runs *before* the main build script
+        run: python scripts/get_git_history.py
+
+      - name: Run Policy Build Script
+        run: python scripts/process_policies.py
+
+      - name: Upload Processed Markdown Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: processed-markdown-policies
+          path: md/
+
+      - name: Upload PDF Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: policy-pdfs
+          path: pdf/
