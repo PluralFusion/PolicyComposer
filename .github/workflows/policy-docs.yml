@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'policy/**.md'
+      - 'policies/**.md'
       - 'conf/**'
   workflow_dispatch:
 
