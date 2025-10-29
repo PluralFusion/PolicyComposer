@@ -39,7 +39,28 @@ On GitHub, create a new repository and make sure to select Private in the visibi
    `/policy` directory in the exact order you want them to appear in the  
    combined PDF.  
 
-5. **Push Changes**
+5. **(Optional) Edit User Map for Version History**
+   If you have md_show_revision_history or similar toggles in your config
+   set to true, the build script will generate a version history table
+   from your git log.
+
+   This script will try to map the author name from Git (e.g., github-username)
+   to a real name (e.g., "Jane Doe").
+
+   To configure this, open conf/usermap.json and add your team's Git usernames
+   and their corresponding full names:
+
+   ```json
+   {
+   "github-username": "Jane Doe",
+   "another-user": "John Smith",
+   "todde": "Todd Emerson"
+   }
+   ```
+
+   If a user isn't found in this map, their Git username will be used in the table.
+
+5. **Push Changes to your PRIVATE repo**
    Commit and push your changes to the main branch. A GitHub Action will  
    automatically run.  
 

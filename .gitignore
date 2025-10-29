@@ -1,11 +1,11 @@
-# Generated Files
-/pdf
-/md
-/build
-/temp_combined
+# Generated build artifacts
+md/
+pdf/
+build/
+temp_combined/
 
-# Python Cache
-/pycache
+# Python cache
+__pycache__/
 
 # Local Configuration
-/config/config-company.yaml
+config/config-company.yaml
