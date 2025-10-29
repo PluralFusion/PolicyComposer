@@ -4,6 +4,7 @@
 
 {{ company }} provides secure and compliant cloud-based software. This hosted software falls into two broad categories: 1) **Platform as a Service (Paas)** and 2) **Platform Add-ons**. These Categories are cited throughout polices as Customers in each category inherit different policies, procedures, and obligations from {{ company }}.
 
+{% if Paas %}
 ## Platform as a Service (PaaS)
 
 PaaS Customers utilized hosted software and infrastructure from {{ company }} to deploy, host, and scale custom developed applications and configured databases. These customers are deployed into compliant containers run on systems secured and managed by {{ company }}. {{ company }} does not have insight or access into application level data of PaaS Customers and, as such, does not have the ability to secure or manage risk associated with application level vulnerabilities and security weaknesses. {{ company }} makes every effort to reduce the risk of unauthorized disclosure, access, and/or breach of PaaS Customer data through network (firewalls, dedicated IP spaces, etc) and server settings (encryption at rest and in transit, OSSEC throughout the Platform, etc).
@@ -15,6 +16,7 @@ PaaS Customers can opt for a list of Services from {{ company }}, which include 
 Add-ons are compliant API-driven services that are offered as part of the {{ company }} Platform. These services currently include our Backend as a Service and secure Messaging Service. With Add-ons, {{ company }} has access to data models and manages all application level configurations and security.
 
 In the future there may be 3rd party Add-on services available as part of the {{ company }} Platform. These 3rd party, or Partner, Services will be fully reviewed by {{ company }} to assure they do not have a negative impact on {{ company }}'s information security and compliance posture.
+{% endif %}
 
 ## Compliance Inheritance
 
