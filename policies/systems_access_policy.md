@@ -93,7 +93,7 @@ All workstations at Pact permitted to access ePHI are company owned, and all are
 ##TODO - hard drive encryption
 * ePHI enabled Workstation hard drives will be encrypted using FileVault 2.0.
 * All ePHI enabled workstations have firewalls enabled to prevent unauthorized access unless explicitly granted.
-* All ePHI enabled workstations are to have the following messages added to the lock screen and login screen: *This computer is owned by Pact, Inc. By logging in, unlocking, and/or using this computer you acknowledge you have seen, and follow, these policies (https://{{ company }}.io/policy/) and have completed this training (https://training.{{ company }}.io/). Please contact us if you have problems with this - privacy@{{ company }}.io.*
+* All ePHI enabled workstations are to have the following messages added to the lock screen and login screen: *This computer is owned by Pact, Inc. By logging in, unlocking, and/or using this computer you acknowledge you have seen, and follow, these policies (https://{{ policy_website  }}) and have completed this training (https://training.{{ company }}.io/). Please contact us if you have problems with this - privacy@{{ company }}.io.*
 
 
 ## Employee Termination Procedures
