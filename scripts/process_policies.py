@@ -6,7 +6,7 @@ import json
 
 # --- 1. Setup ---
 print("Starting policy build process...")
-config_path = 'conf/config.yml'
+config_path = 'conf/config.yaml'
 policy_dir = 'policies'
 order_file = 'conf/policy_order.txt'
 history_file = 'build/git_history.json'
