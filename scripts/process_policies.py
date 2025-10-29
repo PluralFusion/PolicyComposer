@@ -1,6 +1,6 @@
 import os
 import yaml
-from jinja2 import Environment, FileSystemLoader, Template  # <-- Import Template
+from jinja2 import Environment, FileSystemLoader, Template
 import subprocess
 import json
 
@@ -28,10 +28,13 @@ with open(config_path, 'r') as f:
 print(f"Loading history from {history_file}")
 try:
     with open(history_file, 'r') as f:
-        git_history = json.load(f)
+        history_data = json.load(f)
+    CURRENT_BUILD_COMMIT = history_data.get('current_build_commit')
+    FILE_HISTORY = history_data.get('file_history', {})
 except Exception as e:
     print(f"Could not load history file: {e}")
-    git_history = {}
+    CURRENT_BUILD_COMMIT = None
+    FILE_HISTORY = {}
 
 # --- 3. Setup Jinja2 ---
 env = Environment(loader=FileSystemLoader(policy_dir))
@@ -39,17 +42,35 @@ processed_for_combined_pdf = []
 
 # --- Helper Function to Generate History Table ---
 def get_history_table(policy_filename):
-    # History is retrieved using the *source* filename
-    commits = git_history.get(policy_filename)
-    if not commits:
-        return ""
+    # 1. Get the list of commits that *only* touched this file
+    commits = FILE_HISTORY.get(policy_filename, [])
     
+    if not CURRENT_BUILD_COMMIT:
+        return "" # Can't build history if build commit info is missing
+
+    # 2. Check if the current build commit is *already* in the list
+    #    (This happens if the .md file itself was part of the commit)
+    current_commit_hash = CURRENT_BUILD_COMMIT['hash']
+    found_in_history = False
+    for commit in commits:
+        if commit['hash'] == current_commit_hash:
+            found_in_history = True
+            break
+            
+    # 3. If not found, it means the build was triggered by a config change.
+    #    Manually add the current build commit to the top of the list.
+    if not found_in_history:
+        print(f"  -> Appending config-change commit {current_commit_hash[:7]} to history")
+        commits.insert(0, CURRENT_BUILD_COMMIT)
+    
+    # 4. Build the markdown table
     table = "\n\n## Version History\n\n"
     table += "| Date | Updated By | Commit | Comments |\n"
     table += "| :--- | :--- | :--- | :--- |\n"
     
     for commit in commits:
         hash_short = commit['hash'][:7]
+        # We'd need the repo URL from config to make this a link
         table += f"| {commit['date']} | {commit['author_name']} | {hash_short} | {commit['subject']} |\n"
         
     return table
@@ -62,18 +83,18 @@ with open(order_file, 'r') as f:
         if not policy_filename:
             continue
             
-        # --- NEW: RENDER THE FILENAME ITSELF ---
+        # Render the filename itself
         filename_template = Template(policy_filename)
         rendered_filename = filename_template.render(config)
         print(f"Processing: {policy_filename}  ->  Output: {rendered_filename}")
-        # --- END NEW SECTION ---
 
         try:
-            # 1. Render Jinja2 template (use original filename to load)
+            # 1. Render Jinja2 template
             template = env.get_template(policy_filename)
             rendered_content = template.render(config)
             
             # 2. Generate history table (use original filename to look up)
+            # This function now has the new logic
             history_table = get_history_table(policy_filename)
             
             # 3. Apply history based on config toggles
@@ -89,13 +110,13 @@ with open(order_file, 'r') as f:
             if config.get('combined_pdf_show_revision_history', False):
                 combined_content += history_table
 
-            # --- 5. Save Processed Markdown (use rendered_filename) ---
+            # 5. Save Processed Markdown
             md_path = os.path.join(md_output_dir, rendered_filename)
             with open(md_path, 'w') as out_f:
                 out_f.write(md_content)
 
-            # --- 6. Create Individual PDF (use rendered_filename) ---
-            pdf_filename = rendered_filename.replace('.md', '.pdf') # Use rendered name
+            # 6. Create Individual PDF
+            pdf_filename = rendered_filename.replace('.md', '.pdf')
             pdf_path = os.path.join(pdf_output_dir, pdf_filename)
             
             print(f"  -> Converting to individual PDF: {pdf_path}")
@@ -105,7 +126,7 @@ with open(order_file, 'r') as f:
                 check=True
             )
             
-            # --- 7. Save file for Combined PDF (use rendered_filename) ---
+            # 7. Save file for Combined PDF
             temp_combined_path = os.path.join(temp_combined_dir, rendered_filename)
             with open(temp_combined_path, 'w') as out_f:
                 out_f.write(combined_content)
