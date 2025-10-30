@@ -1,4 +1,4 @@
-#TODO - determine what we must include for Pact, and what we should keep from {{ company }}
+#TODO - determine what we must include for {{ company }}, and what we should keep from {{ company }}
 
 # Key Definitions
 

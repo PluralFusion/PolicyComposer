@@ -1,30 +1,140 @@
-#TODO - determine if Pact is responsible for this.
-
 # Incident Response Policy
 
 {{ company }} implements an information security incident response process to consistently detect, respond, and report incidents, minimize loss and destruction, mitigate the weaknesses that were exploited, and restore information system functionality and business continuity as soon as possible.
 
+## Service-Specific Response Requirements
+
+{% if service_types.saas.enabled %}
+### SaaS Platform Incidents
+* Service availability monitoring
+* Customer data protection
+* Platform security events
+* API and service endpoint monitoring
+{% endif %}
+
+{% if service_types.paas.enabled %}
+### PaaS Environment Incidents
+* Infrastructure security events
+* Container security incidents
+* Customer environment isolation
+* Platform service disruptions
+{% endif %}
+
+{% if service_types.medical_device.enabled %}
+### Medical Device Incidents
+* Device malfunction events
+* FDA reportable incidents
+* Patient safety concerns
+* Device security breaches
+{% endif %}
+
+{% if service_types.mobile_app.enabled %}
+### Mobile Application Incidents
+* App security events
+* User data breaches
+* API security incidents
+* Client-side vulnerabilities
+{% endif %}
+
+{% if compliance_frameworks.soc2 %}
+## SOC2 Incident Response Requirements
+
+### Security Incidents (CC7.3, CC7.4)
+* Documented incident response procedures
+* Incident classification and prioritization
+* Communication protocols and escalation procedures
+* Root cause analysis requirements
+* Incident documentation and tracking
+
+### Availability Incidents (A1.2)
+* Service disruption response procedures
+* Business continuity activation criteria
+* Customer communication protocols
+* Recovery time objectives (RTO)
+* Recovery point objectives (RPO)
+
+### Confidentiality Incidents (C1.2)
+* Data breach response procedures
+* Customer data exposure protocols
+* Regulatory reporting requirements
+* Evidence preservation procedures
+* Post-incident data protection review
+
+### Processing Integrity Incidents (PI1.4)
+* System processing failure response
+* Data integrity verification procedures
+* Transaction rollback protocols
+* System reconciliation requirements
+* Processing accuracy verification
+{% endif %}
+
+## Security Infrastructure
+
+### Monitoring and Detection
+{% if security_vendors %}
+1. Security Tools and Services:
+{% for vendor in security_vendors %}
+   * {{ vendor }} for security monitoring and threat detection
+{% endfor %}
+{% endif %}
+
+{% if monitoring_vendors %}
+2. System Monitoring:
+{% for vendor in monitoring_vendors %}
+   * {{ vendor }} for performance and availability monitoring
+{% endfor %}
+{% endif %}
+
+3. Vulnerability Management:
+   * {{ vulnerability_scanner.name }} by {{ vulnerability_scanner.provider }} to {{ vulnerability_scanner.functions }}
+
+### Process Overview
+
 The incident response process addresses:
 
-* Continuous monitoring of threats through intrusion detection systems (IDS) and other monitoring applications;
-* Establishment of an information security incident response team;
-* Establishment of procedures to respond to media inquiries;
-* Establishment of clear procedures for identifying, responding, assessing, analyzing, and follow-up of information security incidents;
-* Workforce training, education, and awareness on information security incidents and required responses; and
-* Facilitation of clear communication of information security incidents with internal, as well as external, stakeholders
+1. Continuous Monitoring
+   * Real-time threat detection
+   * Security event correlation
+   * Performance monitoring
+   * Automated alerting
 
-## Applicable Standards from the HITRUST Common Security Framework
+2. Response Organization
+   * Information security incident response team
+   * Clear roles and responsibilities
+   * Escalation procedures
+   * Communication protocols
 
+3. Documentation and Communication
+   * Incident tracking and documentation
+   * Stakeholder notifications
+   * Media response procedures
+   * Regulatory reporting requirements
+
+## Applicable Standards
+
+{% if compliance_frameworks.hitrust %}
+### HITRUST Common Security Framework
 * 02.f - Disciplinary Process
 * 06.f - Prevention of Misuse of Information Assets
 * 11.a - Reporting Information Security Events
 * 11.c - Responsibilities and Procedures
-* 11.a - Reporting Information Security Events
+* 11.d - Learning from Information Security Incidents
+{% endif %}
 
-## Applicable Standards from the HIPAA Security Rule
-
+{% if compliance_frameworks.hipaa %}
+### HIPAA Security Rule
 * 164.308(a)(5)(i) – Security Awareness and Training
 * 164.308(a)(6) – Security Incident Procedures
+* 164.308(a)(6)(i) – Security Incident Response Process
+* 164.308(a)(6)(ii) – Response and Reporting
+{% endif %}
+
+{% if iso27001 %}
+### ISO 27001 Controls
+* A.16.1.1 - Responsibilities and procedures
+* A.16.1.2 - Reporting information security events
+* A.16.1.5 - Response to information security incidents
+{% endif %}
 
 ## Incident Management Policies
 
@@ -118,17 +228,105 @@ The Follow-up Phase represents the review of the security incident to look for �
 	4. Carry out recommendations approved by Senior Management; sufficient budget, time and resources should be committed to this activity.
 	5. Close the security incident.
 
-### Periodic Evaluation
+### Periodic Evaluation and Testing
 
-It is important to note that the processes surrounding security incident response should be periodically reviewed and evaluated for effectiveness. This also involves appropriate training of resources expected to respond to security incidents, as well as the training of the general population regarding the {{ company }}’s expectation for them, relative to security responsibilities. The incident response plan is tested annually.
+{% if audit_penetration_external.performed %}
+External penetration testing is performed {{ audit_penetration_external.frequency }} by {{ audit_penetration_external.auditor_name }}.
+{% endif %}
+
+{% if audit_penetration_internal.performed %}
+Internal security testing is conducted {{ audit_penetration_internal.frequency }} by {{ audit_penetration_internal.auditor_name }}.
+{% endif %}
+
+The incident response processes are reviewed and evaluated regularly for effectiveness. This includes:
+
+1. Annual testing of the incident response plan
+2. Regular training of response team members
+3. Updates to procedures based on lessons learned
+4. Integration of new security tools and capabilities:
+{% for vendor in security_vendors %}
+   * {{ vendor }} for security monitoring and response
+{% endfor %}
+{% for vendor in monitoring_vendors %}
+   * {{ vendor }} for system and performance monitoring
+{% endfor %}
+
+### Security Tooling and Monitoring
+* {{ vulnerability_scanner.name }} by {{ vulnerability_scanner.provider }} is used to {{ vulnerability_scanner.functions }}
+* Continuous monitoring and alerting through approved security tools
+* Regular vulnerability assessments and remediation
+* Integration with approved monitoring and logging platforms
+
+{% if soc2 %}
+### SOC2 Monitoring and Reporting Requirements
+
+#### Continuous Monitoring (CC3.2, CC4.1)
+* Real-time security event monitoring
+* Automated alert generation and escalation
+* System performance and availability monitoring
+* User activity and access monitoring
+* Data processing integrity checks
+
+#### Incident Metrics and Reporting
+* Mean time to detect (MTTD) tracking
+* Mean time to respond (MTTR) tracking
+* Incident resolution time tracking
+* Root cause analysis statistics
+* Trend analysis and reporting
+
+#### Documentation Requirements
+* Detailed incident chronology
+* Response actions and outcomes
+* Evidence preservation records
+* Communication logs
+* Post-incident review findings
+
+#### Stakeholder Communication
+* Internal notification procedures
+* Customer impact notifications
+* Regulatory reporting timeline
+* Status update frequency
+* Resolution confirmation process
+
+#### Compliance Reporting
+* SOC2 audit evidence collection
+* Control effectiveness documentation
+* Incident response testing results
+* Training completion records
+* Policy adherence verification
+{% endif %}
 
 ## Security Incident Response Team (SIRT)
 
-Individuals needed and responsible to respond to a security incident make up a Security Incident Response Team (SIRT). Members may include the following:
+The Security Incident Response Team (SIRT) is responsible for coordinating and managing security incidents. The team includes:
 
-* Security Officer
-* Privacy Officer
-* Senior Management
-* VP of Engineering
+### Core Team Members
+* {{ security_officer_name }} (Security Officer)
+* {{ privacy_officer_name }} (Privacy Officer)
+* Senior Management Representatives
+* Technical Response Team
+
+### Vendor Coordination
+{% if security_vendors %}
+1. Security Tool Vendors:
+{% for vendor in security_vendors %}
+   * {{ vendor }} - Security monitoring and response
+{% endfor %}
+{% endif %}
+
+{% if platform_vendors %}
+2. Infrastructure Providers:
+{% for vendor in platform_vendors %}
+   * {{ vendor }}{% if vendor in baa_vendors %} (with BAA){% endif %}
+{% endfor %}
+{% endif %}
+
+### Testing and Validation
+{% if audit_penetration_external.performed %}
+* External Testing: {{ audit_penetration_external.frequency }} by {{ audit_penetration_external.auditor_name }}
+{% endif %}
+{% if audit_penetration_internal.performed %}
+* Internal Testing: {{ audit_penetration_internal.frequency }} by {{ audit_penetration_internal.auditor_name }}
+{% endif %}
 
 

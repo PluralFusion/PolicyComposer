@@ -2,7 +2,7 @@
 
 # Employees Policy
 
-Pact is committed to ensuring all workforce members actively address security and compliance in their roles at Pact. As such, training is imperative to assuring an understanding of current best practices, the different types and sensitivities of data, and the sanctions associated with non-compliance.
+{{ company }} is committed to ensuring all workforce members actively address security and compliance in their roles at {{ company }}. As such, training is imperative to assuring an understanding of current best practices, the different types and sensitivities of data, and the sanctions associated with non-compliance.
 
 ## Applicable Standards from the HITRUST Common Security Framework
 
@@ -22,15 +22,15 @@ Pact is committed to ensuring all workforce members actively address security an
 	* Records of training are kept for all workforce members.
 	* Upon completion of training, workforce members complete this [form](https://docs.google.com/a/{{ company }}.io/forms/d/1bmEK3TidACj6ForBqGMaINPjIckv9ht28rtkGEQsBGs/viewform?usp=send_form).
 	* Ongoing security training is conducted monthly.
-	* Current Pact training is hosted [here](https://training.{{ company }}.io/).
+	* Current {{ company }} training is hosted [here](https://training.{{ company }}.io/).
 2. All workforce members are granted access to formal organizational policies, which include the sanction policy for security violations.
-3. The Pact Employee Handbook clearly states the responsibilities and acceptable behavior regarding information system usage, including rules for email, Internet, mobile devices and social media usage.
+3. The {{ company }} Employee Handbook clearly states the responsibilities and acceptable behavior regarding information system usage, including rules for email, Internet, mobile devices and social media usage.
 
 ## Why??
 4. {{ company }} does not allow mobile devices to conned to any of its production networks. 
 
 5. All workforce members are educated about the approved set of tools to be used with PHI on workstations.
-6. All new workforce members are given HIPAA training within 60 days of beginning employment. Training includes HIPAA reporting requirements, including the ability to anonymously report security incidents, and the levels of compliance and obligations for Pact and its Customers and Partners.
+6. All new workforce members are given HIPAA training within 60 days of beginning employment. Training includes HIPAA reporting requirements, including the ability to anonymously report security incidents, and the levels of compliance and obligations for {{ company }} and its Customers and Partners.
 7. All remote (teleworking) workforce members are trained on the risks, the controls implemented, their responsibilities, and sanctions associated with violation of policies. Additionally, remote security is maintained through the use of VPN tunnels for all access to production systems with access to ePHI data.
 
 ##Not sure about this - is this necessary?

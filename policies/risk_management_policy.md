@@ -1,8 +1,43 @@
-#TODO - determine if this is necessary for Pact
-
 # Risk Management Policy
 
-This policy establishes the scope, objectives, and procedures of {{ company }}'s information security risk management process. The risk management process is intended to support and protect the organization and its ability to fulfill its mission. 
+This policy establishes the scope, objectives, and procedures of {{ company }}'s information security risk management process. The risk management process is intended to support and protect the organization and its ability to fulfill its mission across all service platforms and delivery models.
+
+{% if hipaa %}
+## HIPAA Risk Management Requirements
+This policy specifically addresses the requirements set forth in the HIPAA Security Rule for risk analysis and management, ensuring compliance across all service delivery platforms.
+{% endif %}
+
+{% if service_types.saas %}
+## SaaS Platform Risk Considerations
+* Multi-tenant data isolation risks
+* Shared infrastructure vulnerabilities
+* Third-party integration security
+* Data processing and storage compliance
+{% endif %}
+
+{% if service_types.paas %}
+## PaaS Environment Risk Considerations
+* Container security and isolation
+* Customer application deployment risks
+* Infrastructure security controls
+* API security and access management
+{% endif %}
+
+{% if service_types.medical_device %}
+## Medical Device Risk Considerations
+* FDA compliance requirements
+* Patient safety implications
+* Device-specific vulnerabilities
+* Remote access and update risks
+{% endif %}
+
+{% if service_types.mobile_app %}
+## Mobile Application Risk Considerations
+* Device diversity and security
+* Local data storage risks
+* Network security in mobile contexts
+* User authentication and authorization
+{% endif %}
 
 ## Applicable Standards from the HITRUST Common Security Framework
 
@@ -15,6 +50,21 @@ This policy establishes the scope, objectives, and procedures of {{ company }}'s
 * 164.308(a)(1)(ii)(A) – HIPAA Security Rule Risk Analysis
 * 164.308(a)(1)(ii)(B) – HIPAA Security Rule Risk Management 
 * 164.308(a)(8) – HIPAA Security Rule Evaluation
+
+{% if soc2 %}
+## SOC2 Trust Services Criteria Requirements
+
+### Common Criteria (CC)
+* CC1.1 - Control Environment
+* CC3.1 - Risk Assessment
+* CC3.2 - Risk Mitigation
+* CC4.1 - Monitoring Activities
+
+### Additional Criteria
+* A1.1 - Availability Risk Management
+* C1.1 - Confidentiality Risk Management
+* P1.1 - Privacy Risk Management
+{% endif %}
 
 ## Risk Management Policies
 
@@ -39,6 +89,42 @@ This policy establishes the scope, objectives, and procedures of {{ company }}'s
 
 **Risk Assessment**: The intent of completing a risk assessment is to determine potential threats and vulnerabilities and the likelihood and impact should they occur. The output of this process helps to identify appropriate controls for reducing or eliminating risk.
 
+{% if SaaS or PaaS or Medical_Device or Mobile_App %}
+### Platform-Specific Risk Assessment Requirements
+
+{% if SaaS %}
+**SaaS Platform Assessment**
+* Evaluate multi-tenant isolation mechanisms
+* Assess data processing workflows
+* Review access control systems
+* Analyze backup and recovery procedures
+{% endif %}
+
+{% if PaaS %}
+**PaaS Environment Assessment**
+* Evaluate container security
+* Assess customer isolation effectiveness
+* Review deployment pipelines
+* Analyze infrastructure security
+{% endif %}
+
+{% if Medical_Device %}
+**Medical Device Assessment**
+* Evaluate FDA compliance requirements
+* Assess device-specific security controls
+* Review update and patch mechanisms
+* Analyze device-to-cloud communication
+{% endif %}
+
+{% if Mobile_App %}
+**Mobile Application Assessment**
+* Evaluate device security requirements
+* Assess data synchronization security
+* Review offline data protection
+* Analyze authentication mechanisms
+{% endif %}
+{% endif %}
+
 * Step 1. System Characterization
 	* The first step in assessing risk is to define the scope of the effort. To do this, identify where ePHI is received, maintained, processed, or transmitted. Using information-gathering techniques, the {{ company }} Platform boundaries are identified.
 	* Output – Characterization of the {{ company }} Platform system assessed, a good picture of the Platform environment, and delineation of Platform boundaries.
@@ -59,7 +145,7 @@ This policy establishes the scope, objectives, and procedures of {{ company }}'s
 	* Determine the overall likelihood rating that indicates the probability that a vulnerability could be exploited by a threat-source given the existing or planned security controls.
 	* Output – Likelihood rating of low (.1), medium (.5), or high (1). Refer to the NIST SP 800-30 definitions of low, medium, and high.
 
-* Step 6. Impact Analysis
+* Step 6. impact Analysis
 	* Determine the level of adverse impact that would result from a threat successfully exploiting a vulnerability. Factors of the data and systems to consider should include the importance to {{ company }}'s mission; sensitivity and criticality (value or importance); costs associated; loss of confidentiality, integrity, and availability of systems and data.
 	* Output – Magnitude of impact rating of low (10), medium (50), or high (100). Refer to the NIST SP 800-30 definitions of low, medium, and high.
 
@@ -74,6 +160,38 @@ This policy establishes the scope, objectives, and procedures of {{ company }}'s
 * Step 9. Results Documentation
 	* Results of the risk assessment are documented in an official report, spreadsheet, or briefing and provided to senior management to make decisions on policy, procedure, budget, and Platform operational and management changes.
 	* Output – A risk assessment report that describes the threats and vulnerabilities, measures the risk, and provides recommendations for control implementation.
+
+{% if hipaa %}
+* Step 10. HIPAA Compliance Documentation
+	* Map identified risks to specific HIPAA Security Rule requirements
+	* Document compliance gaps and remediation plans
+	* Maintain evidence of risk assessment completion
+	* Track implementation of security measures
+{% endif %}
+
+{% if SaaS or PaaS or Medical_Device or Mobile_App %}
+* Step 11. Platform-Specific Documentation
+{% if SaaS %}
+	* Document multi-tenant security controls
+	* Map data flow and processing risks
+	* Detail service availability measures
+{% endif %}
+{% if PaaS %}
+	* Document container security measures
+	* Detail customer isolation controls
+	* Map infrastructure security controls
+{% endif %}
+{% if Medical_Device %}
+	* Document FDA compliance measures
+	* Detail device security controls
+	* Map patient safety risk controls
+{% endif %}
+{% if Mobile_App %}
+	* Document mobile security measures
+	* Detail offline data protection
+	* Map authentication controls
+{% endif %}
+{% endif %}
 
 **Risk Mitigation**: Risk mitigation involves prioritizing, evaluating, and implementing the appropriate risk-reducing controls recommended from the Risk Assessment process to ensure the confidentiality, integrity and availability of {{ company }} Platform ePHI. Determination of appropriate controls to reduce risk is dependent upon the risk tolerance of the organization consistent with its goals and mission. 
 
@@ -118,7 +236,51 @@ This policy establishes the scope, objectives, and procedures of {{ company }}'s
 	* If risk reduction expectations are not met, then repeat all or a part of the risk management process so that additional controls needed to lower risk to an acceptable level can be identified.
 	* Output – Residual Risk documentation
 
-**Risk Management Schedule**: The two principle components of the risk management process - risk assessment and risk mitigation - will be carried out according to the following schedule to ensure the continued adequacy and continuous improvement of {{ company }}’s information security program:
+**Risk Management Schedule**: The two principle components of the risk management process - risk assessment and risk mitigation - will be carried out according to the following schedule to ensure the continued adequacy and continuous improvement of {{ company }}'s information security program:
+
+{% if hipaa %}
+**HIPAA-Required Assessment Intervals**:
+* Annual comprehensive risk analysis
+* Periodic technical and non-technical evaluations
+* Post-incident risk reassessment
+* Documentation review every 12 months
+{% endif %}
+
+{% if SaaS or PaaS or Medical_Device or Mobile_App %}
+**Platform-Specific Assessment Schedules**:
+
+{% if SaaS %}
+**SaaS Platform**:
+* Quarterly multi-tenant isolation testing
+* Monthly third-party integration review
+* Weekly automated security scans
+* Daily monitoring of access patterns
+{% endif %}
+
+{% if PaaS %}
+**PaaS Environment**:
+* Monthly container security assessment
+* Weekly infrastructure security review
+* Daily deployment pipeline scanning
+* Continuous customer isolation monitoring
+{% endif %}
+
+{% if Medical_Device %}
+**Medical Devices**:
+* Quarterly FDA compliance review
+* Monthly security patch assessment
+* Weekly vulnerability scanning
+* Continuous monitoring of device operations
+{% endif %}
+
+{% if Mobile_App %}
+**Mobile Applications**:
+* Monthly platform security review
+* Weekly API security assessment
+* Daily authentication monitoring
+* Continuous client-side security scanning
+{% endif %}
+{% endif %}
 
 * Scheduled Basis – an overall risk assessment of {{ company }}’s information system infrastructure will be conducted annually. The assessment process should be completed in a timely fashion so that risk mitigation strategies can be determined and included in the corporate budgeting process.
 * Throughout a System’s Development Life Cycle – from the time that a need for a new, untested information system configuration and/or application is identified through the time it is disposed of, ongoing assessments of the potential threats to a system and its vulnerabilities should be undertaken as a part of the maintenance of the system.

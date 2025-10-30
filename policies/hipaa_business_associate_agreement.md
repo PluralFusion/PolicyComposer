@@ -1,4 +1,4 @@
-#TODO - this BAA applies to {{ company }} - we must create a specific one for Pact
+#TODO -  we must create a specific one for this project
 
 # {{ company }} HIPAA Business Associate Agreement (“BAA”)
 

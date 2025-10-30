@@ -1,21 +1,51 @@
 
 # Auditing Policy
 
-Pact outsources its auditing to {{ company }}, a service provider that stores all ePHI and audit logs.  {{ company }} has signed a BAA with Pact committing to the policy below.
+{% if compliance_frameworks.hipaa %}
+## HIPAA Compliance Context
+This policy implements the requirements of HIPAA § 164.312(b) - Audit Controls and § 164.308(a)(1)(ii)(D) - Information System Activity Review, ensuring proper monitoring of system access and activity involving ePHI.
+{% endif %}
 
-# {{ company }} Auditing Policy
+{% if compliance_frameworks.soc2 %}
+## SOC2 Compliance Context
+This policy supports SOC2 Common Criteria (CC) 4.1 and CC 7.2, addressing system monitoring, logging, and audit trail requirements for security events and user activities.
+{% endif %}
 
-{{ company }} shall audit access and activity of electronic protected health information (ePHI) applications and systems in order to ensure compliance. The Security Rule requires healthcare organizations to implement reasonable hardware, software, and/or procedural mechanisms that record and examine activity in information systems that contain or use ePHI. Audit activities may be limited by application, system, and/or network auditing capabilities and resources. {{ company }} shall make reasonable and good-faith efforts to safeguard information privacy and security through a well-thought-out approach to auditing that is consistent with available resources.
+{% if data_storage_vendors %}
+All {{ company }} logging and auditing infrastructure is maintained by:
+{% for vendor in data_storage_vendors %}
+{%- if not loop.first -%}
+    {%- if loop.last %} and {% else %}, {% endif -%}
+{% endif -%}
+{{ vendor }}
+{%- endfor -%}.
 
-It is the policy of {{ company }} to safeguard the confidentiality, integrity, and availability of applications, systems, and networks. To ensure that appropriate safeguards are in place and effective, {{ company }} shall audit access and activity to detect, report, and guard against:
+{% for vendor in data_storage_vendors %}
+{% if vendor in baa_vendors %}
+{{ vendor }} has signed a BAA with {{ company }} committing to the policy below.
+{% endif %}
+{% endfor %}
+{% endif %}
 
-* Network vulnerabilities and intrusions;
-* Breaches in confidentiality and security of patient protected health information;
-* Performance problems and flaws in applications;
-* Improper alteration or destruction of ePHI;
-* Out of date software and/or software known to have vulnerabilities.
+{{ company }} implements comprehensive auditing and monitoring controls to ensure the security, integrity, and compliance of its systems and data. This policy establishes requirements for system activity monitoring, log management, and audit trails across all {{ company }} environments.
 
-This policy applies to all {{ company }} Add-on systems, including BaaS, that store, transmit, or process ePHI. This policy, and associated procedures, do not apply to PaaS Customers that do not choose {{ company }} Logging Service. 
+It is the policy of {{ company }} to safeguard the confidentiality, integrity, and availability of all systems and data through effective auditing and monitoring. {{ company }} shall audit access and activity to detect, report, and guard against:
+
+* Network vulnerabilities and intrusions
+* Security breaches and unauthorized access
+* Performance issues and application flaws
+* Unauthorized data modifications or deletions
+* System and software vulnerabilities
+
+{% if service_types.paas.enabled %}
+This policy applies to all {{ company }} systems and services, with specific provisions for PaaS Customers:
+* PaaS Customers using {{ company }} Logging Service receive full audit capabilities
+* PaaS Customers not using {{ company }} Logging Service are responsible for their own logging and auditing
+{% endif %}
+
+{% if service_types.saas.enabled %}
+For SaaS offerings, {{ company }} maintains complete audit trails of all system and data access.
+{% endif %}
 
 ## Applicable Standards from the HITRUST Common Security Framework
 

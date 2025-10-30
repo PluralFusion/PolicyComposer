@@ -1,66 +1,275 @@
-# Variables for policy documents
+# Organization Information
+# Core company details and contact information
 company_name: "ACME LTD"
-company: "ACME" # Short name
+company: "ACME"  # Short name used throughout policies
+company_website: "https://example.com"
+company_service: "widgets, thingamabobs, and doodads"
+company_service_user_types: "coyotes, hunters, and other cartoon characters"
+
+# Key Personnel
 security_officer_name: "Wile E. Coyote"
 security_office_email: "security@example.com"
 privacy_officer_name: "Elmer Fudd"
 privacy_officer_email: "privacy@example.com"
-company_service: "widgets, thingamabobs, and doodads"
-company_service_user_types: "coyotes, hunters, and other cartoon characters"
-company_website: "https://example.com"
-hipaa_website: "https://example.com/hipaa"
+
+# Policy Management
 policy_website: "https://example.com/policy"
-change_request_form_ling: "https://docs.google.com/a/example.com/forms/d/randomstuff/viewform"
+hipaa_website: "https://example.com/hipaa"
+change_request_form_link: "https://docs.google.com/a/example.com/forms/d/randomstuff/viewform"
 
-
-# PDF build metadata
+# Document Generation Settings
+## PDF Metadata
 combined_pdf_title: "ACME Compliance Policy Manual"
 combined_pdf_author: "ACME LTD"
 
+## Review Committee
 show_review_committee: true
 review_committee:
   - "Wile E. Coyote"
   - "Elmer Fudd"
 
-
-# Feature Toggles
+## Content Controls
 show_internal_notes: true
 
-# Revision History Toggles
-# These control if the git log is appended to the output files
+## Version History Settings
+# Controls whether git log history appears in generated documents
 md_show_revision_history: true
 pdf_show_revision_history: true
 combined_pdf_show_revision_history: false
 
-## Service Type Toggles (placeholders mostly)
-SaaS: true
-PaaS: false
-IaaS: false
-BaaS: false
-Managed_Service: false
-Hosting_Service: false
-Consulting_Service: false
-Mobile_App_Service: false
+# Service Offerings and Infrastructure
+## Service Types
+service_types:
+  saas:
+    enabled: true
+    phi_access: true          # Indicates if SaaS handles PHI/ePHI
+    data_isolation: true      # Multi-tenant data isolation
+    api_security: true        # API security controls
+  
+  paas:
+    enabled: true
+    container_isolation: true  # Container-based isolation
+    phi_access: true          # PaaS handles PHI/ePHI
+    customer_deployment: true  # Customer deployment capabilities
+  
+  medical_device:
+    enabled: true
+    fda_registered: true      # FDA registration status
+    phi_access: true          # Device handles PHI/ePHI
+    patient_safety: true      # Patient safety controls
+  
+  mobile_app:
+    enabled: true
+    encryption: true          # Mobile data encryption
+    phi_access: true          # App handles PHI/ePHI
+    offline_mode: true        # Offline functionality
+  
+  iaas:
+    enabled: false
+    description: "Infrastructure as a Service"
+  
+  baas:
+    enabled: false
+    description: "Backend as a Service"
+  
+  managed_service:
+    enabled: false
+    description: "Managed Service Provider"
+  
+  hosting_service:
+    enabled: false
+    description: "Hosting Service Provider"
+  
+  consulting_service:
+    enabled: false
+    description: "Consulting Services"
+  
+  other_service:
+    enabled: false
+    services:
+      - name: "IoT Platform"
+        description: "A platform for managing IoT devices and data"
+      - name: "AI/ML Service"
+        description: "A service offering AI and machine learning capabilities"
+ephi_access: true  # Canonical flag indicating whether ACME handles PHI/ePHI
 
-Other_Service: false
-Other_Service_Description: ""
+# Vendor Management and Infrastructure
+## Policy Controls
+vendor_management_policy: true
+vendor_risk_assessment: true
+vendor_security_requirements: true
+vendor_monitoring_auditing: true
+vendor_termination_procedures: true
+
+## Service Providers
+data_storage_vendors:
+  - "AWS"
+  - "Google Cloud"
+  - "Microsoft Azure"
+hosting_vendors:
+  - "AWS"
+platform_vendors:
+  - "AWS"
+monitoring_vendors:
+  - "Datadog"
+  - "PagerDuty"
+security_vendors:
+  - "CrowdStrike"
+  - "Splunk"
+data_backup_vendors:
+  - "Veeam"
+  - "Druva"
+disaster_recovery_vendors:
+  - "Zerto"
+  - "Carbonite"
+
+## Compliance Agreements
+baa_vendors:  # Business Associate Agreements
+  - "AWS"
+  - "Google Cloud"
+  - "Microsoft Azure"
+
+## Security Tools
+vulnerability_scanner:
+  name: "Nessus Scanner"
+  provider: "Tenable"
+  functions: "consistently scan, identify, and address vulnerabilities"
+
+# Compliance and Audit Management
+## Active Frameworks
+compliance_frameworks:
+  hipaa: true      # Health Insurance Portability and Accountability Act
+  hitrust: true    # HITRUST CSF
+  soc2: true       # SOC 2 Type II
+  iso27001: false  # ISO/IEC 27001
+  pci_dss: false   # Payment Card Industry Data Security Standard
+  gdpr: false      # General Data Protection Regulation
+  ccpa: false      # California Consumer Privacy Act
+  other: false
+  other_description: ""
+
+## Audit Status
+hipaa_audit:
+  in_progress: false
+  completed: true
+  completed_date: "YYYY-MM-DD"
+
+hitrust_audit:
+  in_progress: false
+  completed: false
+  certification_date: ""
+
+## Security Testing
+audit_penetration_external:
+  performed: true
+  frequency: "bi-annual"
+  auditor_name: "a third-party security firm"
+  findings_addressed: true
+
+audit_penetration_internal:
+  performed: true
+  frequency: "with each major release"
+  auditor_name: "PluralFusion" 
+  findings_addressed: true
+
+# Workplace Environment Configuration
+## Remote Work Policy
+remote_work:
+  enabled: true
+  models:
+    hybrid: true
+    full_time: true
+    international: true
+    temporary: true
+  
+  security:
+    vpn_required: true
+    mfa_required: true
+    monitoring_enabled: true
+    time_tracking_required: true
+  
+  equipment:
+    company_provided: true
+    stipend_available: true
+    ergonomic_requirements: true
+    internet_requirements: true
+
+## BYOD (Bring Your Own Device)
+byod:
+  policy_enabled: true
+  allowed_devices:
+    phones: true
+    computers: true
+    other_devices: true
+  
+  security_requirements:
+    mdm_required: true
+    encryption_required: true
+    password_policy_enforced: true
+    screen_lock_required: true
+  
+  management:
+    app_restrictions: true
+    data_backup_required: true
+    remote_wipe_enabled: true
+    security_scanning: true
 
 
+# Approved Technology Stack
+## Software Tools
+approved_tools:
+  collaboration:
+    - name: "Google Workspace"
+      type: "Productivity Suite"
+      approved_for: ["Email", "Document Creation", "Spreadsheets", "Presentations"]
+    - name: "Google Meet"
+      type: "Video Conferencing"
+      approved_for: ["Remote Work", "Internal Meetings"]
+    - name: "Slack"
+      type: "Messaging"
+      approved_for: ["Internal Communication"]
+    - name: "Mattermost"  
+      type: "Messaging"
+      approved_for: ["Internal Communication"]
+  
+  development:
+    - name: "Github"
+      type: "Source Code Management"
+      approved_for: ["Code Repository", "Version Control"]
+    - name: "Github Projects"
+      type: "Project Management"
+      approved_for: ["Task Tracking", "Project Planning"]
+    - name: "VS Code"
+      type: "IDE"
+      approved_for: ["Code Development"]
+    - name: "JetBrains Toolbox" 
+      type: "IDE"
+      approved_for: ["Code Development"]
+    - name: "Codex"
+      type: "IDE"
+      approved_for: ["Code Development"]
+  
+  productivity:
+    - name: "OnlyOffice"
+      type: "Document Management"
+      approved_for: ["Document Creation", "Collaboration"]
+    - name: "LibreOffice"
+      type: "Productivity Suite"
+      approved_for: ["Document Creation", "Spreadsheets", "Presentations"]
 
-# Compliance Framework Toggles
-hipaa: true
-hitRUST: false
-soc2: false
-iso27001: false
-pci_dss: false
-gdpr: false
-ccpa: false
-other_frameworks: false
-other_frameworks_description: ""
-
-hipaa_audit_inprogress: false
-hipaa_audit_completed: true
-hipaa_audit_completed_date: "YYYY-MM-DD"
-hitRUST_audit_inprogress: false
-hitRUST_audit_completed: false
-hitRUST_audit_certification_date: ""
+## Operating Systems
+approved_os:
+  workstations:
+    linux:
+      - name: "Ubuntu 24.04 LTS"
+      - name: "Ubuntu 22.04 LTS"
+    macos:
+      - name: "macOS Sonoma"
+      - name: "macOS Ventura"
+    windows:
+      - name: "Windows 11 Pro"
+  
+  servers:
+    linux:
+      - name: "Debian 12"
+      - name: "Ubuntu 24.04 LTS"

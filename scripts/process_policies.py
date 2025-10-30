@@ -8,7 +8,7 @@ import json
 print("Starting policy build process...")
 config_path = 'conf/config.yaml'
 policy_dir = 'policies'
-order_file = 'conf/policy_order.txt'
+order_file = 'conf/policy_order.yaml' 
 history_file = 'build/git_history.json'
 
 # Output directories
@@ -24,6 +24,16 @@ os.makedirs(temp_combined_dir, exist_ok=True)
 print(f"Loading config from {config_path}")
 with open(config_path, 'r') as f:
     config = yaml.safe_load(f)
+
+# Load the policy order config
+print(f"Loading policy order from {order_file}")
+try:
+    with open(order_file, 'r') as f:
+        policy_order_config = yaml.safe_load(f)
+    POLICY_FILES_LIST = policy_order_config.get('policy_files', [])
+except Exception as e:
+    print(f"ERROR: Could not load or parse {order_file}: {e}")
+    exit(1)
 
 print(f"Loading history from {history_file}")
 try:
@@ -76,65 +86,68 @@ def get_history_table(policy_filename):
     return table
 
 # --- 4. Process Each Policy File ---
-print(f"Reading policy order from {order_file}")
-with open(order_file, 'r') as f:
-    for policy_filename in f:
-        policy_filename = policy_filename.strip()
-        if not policy_filename:
-            continue
-            
-        # Render the filename itself
-        filename_template = Template(policy_filename)
-        rendered_filename = filename_template.render(config)
-        print(f"Processing: {policy_filename}  ->  Output: {rendered_filename}")
+print(f"Processing {len(POLICY_FILES_LIST)} policy files from {order_file}...")
+for policy_item in POLICY_FILES_LIST:
+    try:
+        policy_filename = policy_item['source']
+        output_filename_template = policy_item['output']
+    except (TypeError, KeyError):
+        print(f"  -> WARNING: Skipping malformed item in {order_file}. Must be a list of objects with 'source' and 'output' keys.")
+        print(f"     Item: {policy_item}")
+        continue
+        
+    # Render the *output* filename
+    filename_template = Template(output_filename_template)
+    rendered_filename = filename_template.render(config)
+    print(f"Processing: {policy_filename}  ->  Output: {rendered_filename}")
 
-        try:
-            # 1. Render Jinja2 template
-            template = env.get_template(policy_filename)
-            rendered_content = template.render(config)
+    try:
+        # 1. Render Jinja2 template (use the *source* filename)
+        template = env.get_template(policy_filename)
+        rendered_content = template.render(config)
+        
+        # 2. Generate history table (use *source* filename to look up)
+        history_table = get_history_table(policy_filename)
+        
+        # 3. Apply history based on config toggles
+        md_content = rendered_content
+        if config.get('md_show_revision_history', False):
+            md_content += history_table
+        
+        pdf_content = rendered_content
+        if config.get('pdf_show_revision_history', False):
+            pdf_content += history_table
             
-            # 2. Generate history table (use original filename to look up)
-            # This function now has the new logic
-            history_table = get_history_table(policy_filename)
-            
-            # 3. Apply history based on config toggles
-            md_content = rendered_content
-            if config.get('md_show_revision_history', False):
-                md_content += history_table
-            
-            pdf_content = rendered_content
-            if config.get('pdf_show_revision_history', False):
-                pdf_content += history_table
-                
-            combined_content = rendered_content
-            if config.get('combined_pdf_show_revision_history', False):
-                combined_content += history_table
+        combined_content = rendered_content
+        if config.get('combined_pdf_show_revision_history', False):
+            combined_content += history_table
 
-            # 5. Save Processed Markdown
-            md_path = os.path.join(md_output_dir, rendered_filename)
-            with open(md_path, 'w') as out_f:
-                out_f.write(md_content)
+        # 5. Save Processed Markdown
+        md_path = os.path.join(md_output_dir, rendered_filename)
+        with open(md_path, 'w') as out_f:
+            out_f.write(md_content)
 
-            # 6. Create Individual PDF
-            pdf_filename = rendered_filename.replace('.md', '.pdf')
-            pdf_path = os.path.join(pdf_output_dir, pdf_filename)
-            
-            print(f"  -> Converting to individual PDF: {pdf_path}")
-            subprocess.run(
-                ['pandoc', '-o', pdf_path, '--metadata', f"title={rendered_filename.replace('.md', '')}"],
-                input=pdf_content.encode('utf-8'),
-                check=True
-            )
-            
-            # 7. Save file for Combined PDF
-            temp_combined_path = os.path.join(temp_combined_dir, rendered_filename)
-            with open(temp_combined_path, 'w') as out_f:
-                out_f.write(combined_content)
-            processed_for_combined_pdf.append(temp_combined_path)
+        # 6. Create Individual PDF
+        pdf_filename = rendered_filename.replace('.md', '.pdf')
+        pdf_path = os.path.join(pdf_output_dir, pdf_filename)
+        
+        print(f"  -> Converting to individual PDF: {pdf_path}")
+        subprocess.run(
+            ['pandoc', '-o', pdf_path, '--metadata', f"title={rendered_filename.replace('.md', '')}"],
+            input=pdf_content.encode('utf-8'),
+            check=True
+        )
+        
+        # 7. Save file for Combined PDF
+        temp_combined_path = os.path.join(temp_combined_dir, rendered_filename)
+        with open(temp_combined_path, 'w') as out_f:
+            out_f.write(combined_content)
+        processed_for_combined_pdf.append(temp_combined_path)
 
-        except Exception as e:
-            print(f"ERROR processing {policy_filename}: {e}")
-            exit(1)
+    except Exception as e:
+        # This will catch the 'template not found' error if the source file is wrong
+        print(f"ERROR processing {policy_filename}: {e}")
+        exit(1)
 
 # --- 8. Create Final Combined PDF ---
 combined_pdf_path = os.path.join(pdf_output_dir, 'combined_policies.pdf')
@@ -161,3 +174,4 @@ except Exception as e:
     exit(1)
 
 print("Policy build process completed successfully.")
+

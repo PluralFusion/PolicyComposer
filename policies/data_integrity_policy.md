@@ -1,40 +1,75 @@
 # Data Integrity Policy
 
-All Pact data exchanges occur on a platform maintained by {{ company }}, a service provider that stores all of Pact's ePHI.  {{ company }} has signed a BAA with Pact committing to the policy below.
+{% if hipaa %}
+## HIPAA Compliance Context
+This policy implements the requirements of HIPAA § 164.308(a)(8) - Evaluation, ensuring that technical controls maintain the integrity and availability of ePHI throughout its lifecycle.
+{% endif %}
 
-# {{ company }} Data Integrity Policy
+{% if soc2 %}
+## SOC2 Compliance Context
+This policy supports SOC2 Processing Integrity criteria (PI 1.1, PI 1.2, PI 1.3) and Common Criteria (CC 6.1), ensuring data processing integrity, accuracy, and completeness through system configuration and monitoring.
+{% endif %}
+
+{% if platform_vendors %}
+All {{ company }} data exchanges occur on {% if platform_vendors|length == 1 %}a platform maintained by {{ platform_vendors[0] }}{% else %}platforms maintained by {% for vendor in platform_vendors %}{% if not loop.first %}{% if loop.last %} and {% else %}, {% endif %}{% endif %}{{ vendor }}{% endfor %}{% endif %}.
+
+{% for vendor in platform_vendors %}
+{% if vendor in baa_vendors %}
+{{ vendor }} has signed a BAA with {{ company }} committing to the policy below.
+{% endif %}
+{% endfor %}
+{% endif %}
 
 {{ company }} takes data integrity very seriously. As stewards and partners of {{ company }} Customers, we strive to assure data is protected from unauthorized access and that it is available when needed. The following policies drive many of our procedures and technical settings in support of the {{ company }} mission of data protection.
 
-## Applicable Standards from the HITRUST Common Security Framework
+## Applicable Standards
 
+{% if hitrust %}
+### HITRUST Common Security Framework
 * 10.b - Input Data Validation
+* 06.d - Data Integrity Controls
+* 09.aa - Audit Logging
+{% endif %}
 
-## Applicable Standards from the HIPAA Security Rule
-
+{% if hipaa %}
+### HIPAA Security Rule
 * 164.308(a)(8) - Evaluation
+* 164.312(c)(1) - Data Integrity
+* 164.312(e)(2)(i) - Transmission Security
+{% endif %}
 
-## Data integrity Policy
+{% if soc2 %}
+### SOC2 Trust Services Criteria
+* CC6.7 - System Changes
+* PI1.1 - System Processing Integrity
+* CC8.1 - Change Management Process
+{% endif %}
 
-Production Systems that create, receive, store, or transmit customer data (hereafter "Production Systems") must follow the following guidelines.
-
-### Disabling non-essential services
-
-* All Production Systems must disable services that are not required to achieve the business purpose or function of the system. 
-
-### Monitoring Log-in Attempts
+## Access Monitoring and Control
 
 * All access to Production Systems must be logged. This is done following the {{ company }} Auditing Policy.
 
-### Prevention of malware on Production Systems
+### Malware Prevention
 
-* All Production Systems must have OSSEC running at set to scan system every 2 hours and at reboot to assure not malware is present. Detected malware is evaluated and removed.
-* All Production Systems are to only be used for {{ company }} business needs.
+* All Production Systems must have {{ security_vendors[0] }} deployed for continuous threat detection and prevention
+* Regular malware scans are performed using {{ vulnerability_scanner.name }} by {{ vulnerability_scanner.provider }}
+* All Production Systems are restricted to {{ company }} business operations only
 
 ### Patch Management
 
-* Patches, application, and system OS versions are kept up to date at all times. New versions are tested.
-* Administrators subscribe to mailing lists to assure up to date on current version of all {{ company }} managed software on Production Systems.
+{% if soc2 %}
+* Patch management follows SOC2 change management requirements
+* All changes are documented and approved before implementation
+{% endif %}
+
+* Operating system and application patches are regularly tested and applied
+* System administrators maintain awareness of security updates through vendor notifications
+* Approved operating systems for servers are limited to:
+{% for os_type, versions in approved_os.servers.items() %}
+{% for version in versions %}
+  * {{ version.name }}
+{% endfor %}
+{% endfor %}
 
 ### Intrusion Detection and Vulnerability Scanning
 

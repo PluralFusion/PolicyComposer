@@ -21,18 +21,18 @@ should create the following output filenames:
 
 ## Example Content Formatting
 
-{% if hipaa %}
+{% if compliance_frameworks.hipaa %}
 ## HIPAA Requirements
 This policy supports 45 CFR § 164.312(a)(1) \- Access Control.  
 All ePHI access must be logged and reviewed.  
 {% endif %}  
 
-{% if hitRUST %}
+{% if compliance_frameworks.hitrust %}
 ## HITRUST CSF Requirements
 This policy maps to control vX.Y of the HITRUST Common Security Framework.  
 {% endif %}  
 
-{% if soc2 %}
+{% if compliance_frameworks.soc2 %}
 ## SOC2 Trust Criteria
 This policy addresses Common Criteria (CC) 6.1.  
 {% endif %}
@@ -40,7 +40,7 @@ This policy addresses Common Criteria (CC) 6.1.
 ## Compliance (notice nested jinja)
 {{ company }} provides compliant hosted software infrastructure for its Customers.  
 
-{% if hipaa %}  
+{% if compliance_frameworks.hipaa %}  
 {{ company }} is HIPAA compliant.  
 {% if hipaa_audit_inprogress %}  
 {{ company }} undergoing a HIPAA compliance audit by a 3rd party compliance firm to validate and map organizational policies and technical settings to HIPAA rules.  
@@ -50,7 +50,7 @@ This policy addresses Common Criteria (CC) 6.1.
 {% endif %}
 {% endif %}  
 
-{% if hitRUST %}  
+{% if compliance_frameworks.hitrust %}  
 {{ company }} is compliant with the HITRUST CSF.  
 {% if hitRUST_audit_inprogress %}  
 {{ company }} is currently undergoing a HITRUST audit to achieve HITRUST Certification.  
@@ -65,10 +65,10 @@ Internal Note: This section must be reviewed by {{ security_officer_name }}
 by Q4. This note will only appear if show_internal_notes is true in the config.  
 {% endif %}
 
-# **Basic Intro Example (with Jinja2 variables)**
+## **Basic Intro Example (with Jinja2 variables)**
 {{ company_name }} "{{ company }}" is committed to ensuring the confidentiality, privacy, integrity, and availability of all electronic protected health information (ePHI) it receives, maintains, processes and/or transmits on behalf of its Customers. As providers of compliant, {{ company_service }} used by {{ company_service_user_types }}, {{ company }} strives to maintain compliance, proactively address information security, mitigate risk for its Customers, and assure known breaches are completely and effectively communicated in a timely manner. 
 
-{% if PaaS %}
+{% if service_types.paas.enabled %}
 ## **Platform as a Service (PaaS)**
 PaaS Customers utilized hosted software and infrastructure from {{ company }} to deploy, host, and scale custom developed applications and configured databases. These customers are deployed into compliant containers run on systems secured and managed by {{ company }}. {{ company }} does not have insight or access into application level data of PaaS Customers and, as such, does not have the ability to secure or manage risk associated with application level vulnerabilities and security weaknesses. {{ company }} makes every effort to reduce the risk of unauthorized disclosure, access, and/or breach of PaaS Customer data through network (firewalls, dedicated IP spaces, etc) and server settings (encryption at rest and in transit, OSSEC throughout the Platform, etc)....  
 {% endif %}
@@ -82,6 +82,6 @@ This policy has been reviewed and approved by the following members:
 {% for member in review_committee %}
 
 * {{ member }}  
-  {% endfor %}
+{% endfor %}
 
 {% endif %}

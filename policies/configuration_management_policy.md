@@ -1,32 +1,99 @@
 
 # Configuration Management Policy
 
-Pact outsources its configuration management to {{ company }}, a service provider that stores all of Pact's' ePHI.  {{ company }} has signed a BAA with Pact committing to the policy below.
+{% if hipaa %}
+## HIPAA Compliance Context
+This policy implements the requirements of HIPAA § 164.310(a)(2)(iii) - Access Control & Validation Procedures, ensuring consistent and secure configuration of systems that process or store ePHI.
+{% endif %}
 
-# {{ company }} Configuration Management Policy
+{% if soc2 %}
+## SOC2 Compliance Context
+This policy supports SOC2 Common Criteria (CC) 7.1 and CC 8.1, addressing system configuration standardization, change management, and security baseline requirements.
+{% endif %}
 
-{{ company }} standardizes and automates configuration management through the use of Salt scripts as well as documentation of all changes to production systems and networks. Salt automatically configures all {{ company }} systems according to established and tested policies, and is used as part of our Disaster Recovery plan and process.
+{% if platform_vendors %}
+{{ company }} utilizes infrastructure and configuration management services from:
+{% for vendor in platform_vendors %}
+{%- if not loop.first -%}
+    {%- if loop.last %} and {% else %}, {% endif -%}
+{% endif -%}
+{{ vendor }}
+{%- endfor -%}.
 
-## Applicable Standards from the HITRUST Common Security Framework
+{% for vendor in platform_vendors %}
+{% if vendor in baa_vendors %}
+{{ vendor }} has signed a BAA with {{ company }} committing to the policy below.
+{% endif %}
+{% endfor %}
+{% endif %}
 
+{{ company }} standardizes and automates configuration management through comprehensive documentation and automated tools for all changes to production systems and networks. Our configuration management processes are designed to ensure system security, integrity, and compliance with all applicable standards.
+
+## Applicable Standards
+
+{% if hitrust %}
+### HITRUST Common Security Framework
 * 06 - Configuration Management
+{% endif %}
 
-## Applicable Standards from the HIPAA Security Rule
-
+{% if hipaa %}
+### HIPAA Security Rule
 * 164.310(a)(2)(iii) Access Control & Validation Procedures
+{% endif %}
 
-## Configuration Management
+## Configuration Management Controls
 
-1. Salt is used to standardize and automate configuration management.
-2. OSSEC is used to scan systems every 2 hours and on reboot. These scans capture file system changes and also unauthorized or malicious software.
-3. No systems are deployed into {{ company }} environments without approval of the {{ company }} CTO.
-4. All changes to production systems, network devices, and firewalls are approved by the {{ company }} CTO before they are implemented. Additionally, all changes are tested before they are implemented in production.
-5. An up-to-date inventory of systems is maintained using Google spreadsheets and architecture diagrams hosted on Google Apps and Box. All systems are categorized as production and utility to differentiate based on criticality.
-6. Clocks are synchronized across all systems using NTP. Modifying time data on systems is restricted.
-7. All front end functionality (developer dashboards and portals) is separated from backend (database and app servers) systems by being deployed on separate servers.
-8. All software and systems are tested using unit tests and end to end tests.
-9. All committed code is reviewed using pull requests (on Github) to assure software code quality and proactively detect potential security issues in development.
-10. {{ company }} utilizes development and staging environments that mirror production to assure proper function.
-11. {{ company }} also deploys environments locally using Vagrant to assure functionality before moving to staging or production.
-12. {{ company }} schedules production deployments every four weeks.
-13. All formal change requests require unique ID and authentication.
+1. **Vulnerability Management**
+   * {{ vulnerability_scanner.name }} by {{ vulnerability_scanner.provider }} is used to {{ vulnerability_scanner.functions }}.
+   * Scans are performed regularly to detect unauthorized changes or malicious software.
+
+2. **Change Management**
+   * All changes to production systems, network devices, and firewalls require approval from the {{ security_officer_name }} before implementation.
+   * Changes must be tested in development and staging environments before production deployment.
+   * All formal change requests require unique ID and authentication through our {{ change_request_form_link }}.
+
+3. **System Inventory and Documentation**
+   * An up-to-date inventory of systems is maintained using approved collaboration tools.
+   * Systems are categorized based on criticality and data classification.
+   * Architecture diagrams and system documentation are stored in approved document management systems.
+
+4. **Development Practices**
+   * Code changes are managed through {{ approved_tools.development[0].name }} with mandatory code reviews.
+   * Pull requests are required for all code changes to ensure quality and security.
+   * Development, staging, and production environments are maintained with consistent configurations.
+
+5. **System Security**
+   * All front-end functionality is separated from backend systems through appropriate network segmentation.
+   * System clocks are synchronized using NTP, with restricted access to time modifications.
+   * Security tools are implemented across all systems:
+{% for vendor in security_vendors %}
+     * {{ vendor }} for security monitoring and threat detection
+{% endfor %}
+
+6. **Infrastructure Management**
+   * Cloud infrastructure is provided by:
+{% for vendor in platform_vendors %}
+     * {{ vendor }}{% if vendor in baa_vendors %} (BAA in place){% endif %}
+{% endfor %}
+   * Data storage is managed by:
+{% for vendor in data_storage_vendors %}
+     * {{ vendor }}{% if vendor in baa_vendors %} (BAA in place){% endif %}
+{% endfor %}
+
+7. **Monitoring and Alerting**
+   * System monitoring is provided by:
+{% for vendor in monitoring_vendors %}
+     * {{ vendor }}
+{% endfor %}
+
+8. **Operating System Standards**
+   * Server deployments are restricted to:
+{% for os_type, versions in approved_os.servers.items() %}
+{% for version in versions %}
+     * {{ version.name }}
+{% endfor %}
+{% endfor %}
+
+9. **Deployment Schedule**
+   * Production deployments follow a regular schedule with proper change management procedures.
+   * Emergency changes follow an expedited approval process while maintaining security controls.
