@@ -10,15 +10,20 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-docs:
+  build:
     name: Build Processed Docs and PDFs
     runs-on: ubuntu-latest
-    
+    # Set outputs that the next job can consume
+    outputs:
+      is_global_release: ${{ steps.check_release.outputs.is_global_release }}
+      release_tag: ${{ steps.check_release.outputs.release_tag }}
+      release_name: ${{ steps.check_release.outputs.release_name }}
+      
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          # Fetch full history so 'git log' works
+          # Fetch full history so we can diff commits
           fetch-depth: 0 
 
       - name: Set up Python
@@ -29,21 +34,61 @@ jobs:
       - name: Install Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y pandoc texlive-latex-base texlive-fonts-recommended texlive-latex-extra fontconfig
+          sudo apt-get install -y pandoc texlive-latex-base texlive-fonts-recommended texlive-latex-extra
           pip install PyYAML Jinja2
 
-      - name: Generate Font List
+      - name: Check for release version change
+        id: check_release
         run: |
-          echo "--- Generating list of available system fonts ---"
+          # Default to false
+          IS_RELEASE="false"
+          TAG=""
+          NAME=""
+          
+          # Check if config.yaml was part of this push
+          # Use '|| true' to prevent failure on first commit (no HEAD~1)
+          if git diff --name-only HEAD~1 HEAD | grep -q "conf/config.yaml"; then
+            echo "conf/config.yaml was changed."
+            
+            # Get old and new version values from git
+            OLD_VERSION=$(git show HEAD~1:conf/config.yaml | grep 'release_version:' | awk '{print $2}' | tr -d '"' || echo "none")
+            NEW_VERSION=$(grep 'release_version:' conf/config.yaml | awk '{print $2}' | tr -d '"')
+            
+            if [ "$OLD_VERSION" != "$NEW_VERSION" ] && [ -n "$NEW_VERSION" ]; then
+              echo "Global release detected! Version changed from $OLD_VERSION to $NEW_VERSION."
+              IS_RELEASE="true"
+              TAG="$NEW_VERSION"
+              NAME="Policy Documents $NEW_VERSION"
+            else
+              echo "config.yaml changed, but release_version is the same."
+            fi
+          else
+            echo "config.yaml was not changed. This is not a global release."
+          fi
+          
+          # Set the job outputs
+          echo "::set-output name=is_global_release::$IS_RELEASE"
+          echo "::set-output name=release_tag::$TAG"
+          echo "::set-output name=release_name::$NAME"
+
+      - name: List Available Fonts
+        run: |
+          echo "--- START OF INSTALLED FONTS ---"
           fc-list | cut -d: -f2 | sort | uniq > font_list.txt
-          echo "font_list.txt created."
+          echo "--- END OF INSTLED FONTS ---"
+
+      - name: Upload Font List Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: available-fonts
+          path: font_list.txt
 
       - name: Generate Git History
-        # Pass the current commit info as environment variables
         env:
           CURRENT_COMMIT_SHA: ${{ github.sha }}
           CURRENT_COMMIT_ACTOR: ${{ github.actor }}
           CURRENT_COMMIT_MSG: ${{ github.event.head_commit.message }}
+          IS_GLOBAL_RELEASE: ${{ steps.check_release.outputs.is_global_release }}
         run: python scripts/get_git_history.py
 
       - name: Run Policy Build Script
@@ -56,14 +101,38 @@ jobs:
           path: md/
 
       - name: Upload PDF Artifacts
+        # This artifact will be used by the release job
         uses: actions/upload-artifact@v4
         with:
           name: policy-pdfs
           path: pdf/
 
-      - name: Upload Font List Artifact
-        uses: actions/upload-artifact@v4
+  publish-github-release:
+    name: Publish GitHub Release
+    # This job only runs if the 'build' job's output 'is_global_release' was true
+    if: needs.build.outputs.is_global_release == 'true'
+    needs: build
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: write # Permission to create a release
+      
+    steps:
+      - name: Download all build artifacts
+        uses: actions/download-artifact@v4
         with:
-          name: available-fonts
-          path: font_list.txt
+          # Download all artifacts from the build job
+          path: artifacts/
+          
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          # Use the tag and name from the build job's outputs
+          tag_name: ${{ needs.build.outputs.release_tag }}
+          name: ${{ needs.build.outputs.release_name }}
+          body: "Official release of the ${{ needs.build.outputs.release_name }} policy set."
+          # Attach the PDF artifacts to the release
+          files: |
+            artifacts/policy-pdfs/*
+            artifacts/processed-markdown-policies/*
 

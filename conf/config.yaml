@@ -28,14 +28,35 @@ review_committee:
   - "Wile E. Coyote"
   - "Elmer Fudd"
 
-## Content Controls
-show_internal_notes: true
+# --- Advanced Version History Control ---
+#
+# This system supports two types of versioning:
+# 1. Global Releases (Recommended):
+#    To stamp ALL documents with a new version, simply update the
+#    'release_version' variable below. The action will detect this change
+#    and create a new, official GitHub Release with your PDFs.
+# 2. Hotfixes (For single files):
+#    To add a version to just *one* file, commit your change to that file
+#    using the 'release_commit_prefix' (e.g., "RELEASE: Fixed typo").
+#
+# This value is the *current* official version of the policy set.
+# Updating this (e.g., from "v1.0.0" to "v1.1.0") will trigger
+# a new global release for ALL documents.
+release_version: "v1.0.0"
+
+# This prefix is for "hotfix" commits that only apply to a *single* file.
+# It is ignored during a global 'release_version' change.
+release_commit_prefix: "RELEASE:"
 
 ## Version History Settings
 # Controls whether git log history appears in generated documents
 md_show_revision_history: true
 pdf_show_revision_history: true
 combined_pdf_show_revision_history: false
+
+
+## Content Controls
+show_internal_notes: true
 
 # ----------------------------------
 # PDF Font Configuration
