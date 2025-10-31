@@ -58,6 +58,9 @@ combined_pdf_show_revision_history: false
 ## Content Controls
 show_internal_notes: true
 
+# --- Font Settings ---
+# Fonts must be installed on the GitHub runner (or your local machine).
+# Run the 'List Available Fonts' workflow to see all options.
 # ----------------------------------
 # PDF Font Configuration
 # ----------------------------------
@@ -70,7 +73,9 @@ show_internal_notes: true
 # - FreeSans
 # - FreeSerif
 # 
-pdf_main_font: "Noto Sans"
+pdf_main_font: "Noto Sans"        # Main body text
+pdf_header_font: "Noto Sans"      # Headers and titles (defaults to main font)
+pdf_code_font: "Noto Sans Mono"   # Font for code blocks
 
 # Service Offerings and Infrastructure
 ## Service Types

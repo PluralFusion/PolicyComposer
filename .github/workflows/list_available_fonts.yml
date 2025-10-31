@@ -1,0 +1,23 @@
+name: List Available Fonts
+
+# This makes the workflow manually runnable from the GitHub Actions tab
+on:
+  workflow_dispatch:
+
+jobs:
+  list_fonts:
+    name: List Fonts on Runner
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: List Installed Fonts
+        run: |
+          echo "Querying system for all available fonts..."
+          fc-list | cut -d: -f2 | sort | uniq > font_list.txt
+          echo "Font list generated."
+          
+      - name: Upload Font List Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: available-fonts
+          path: font_list.txt
