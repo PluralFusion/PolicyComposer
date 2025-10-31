@@ -1,13 +1,13 @@
 import os
 import subprocess
 import json
-import yaml  # <-- Import YAML library
+import yaml 
 from datetime import datetime
 
 print("Starting Git history export...")
 
 # Config paths
-order_file = 'conf/policy_order.yaml'  # <-- UPDATED to .yaml
+order_file = 'conf/policy_order.yaml'  
 usermap_file = 'conf/usermap.json'
 policy_dir = 'policies'
 output_dir = 'build'
@@ -48,7 +48,7 @@ except KeyError as e:
 print("Getting file-specific history...")
 file_history = {}
 
-# --- UPDATED SECTION to read policy_order.yaml ---
+
 try:
     with open(order_file, 'r') as f:
         policy_order_config = yaml.safe_load(f)
@@ -107,7 +107,7 @@ try:
 except Exception as e:
     print(f"Error during Git history processing: {e}")
     exit(1)
-# --- END UPDATED SECTION ---
+
 
 # --- 3. Write all data to the JSON file ---
 final_history_data = {
