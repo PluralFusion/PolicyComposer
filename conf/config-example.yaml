@@ -67,17 +67,11 @@ show_internal_notes: true
 # ----------------------------------
 # PDF Font Configuration
 # ----------------------------------
-# 'mainfont' is used by Pandoc to set the font.
-# Fonts that should be available on the GitHub runner:
-# - Noto Sans 
-# - Noto Serif (A great, highly-readable serif alternative)
-# - DejaVu Sans
-# - DejaVu Serif
-# - FreeSans
-# - FreeSerif
-pdf_main_font: "Noto Sans"        # Main body text
-pdf_header_font: "Noto Sans"      # Headers and titles (defaults to main font)
-pdf_code_font: "Noto Sans Mono"   # Font for code blocks
+# Fonts must be installed on the GitHub runner (or your local machine).
+# Run the 'List Available Fonts' workflow to see all options.
+pdf_main_font: "DejaVu Sans"        # Main body text
+pdf_header_font: "Lato Semibold"      # Headers and titles (defaults to main font)
+pdf_code_font: "DejaVu Sans Mono"   # Font for code blocks
 
 # Service Offerings and Infrastructure
 ## Service Types
