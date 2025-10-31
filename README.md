@@ -35,7 +35,7 @@ The `conf/` directory contains all the files needed to customize your policies.
    ```
   Now, edit conf/config.yaml and fill in all your company's specific information (names, emails, compliance toggles, etc.)
 
-- **Policy Order:** Open `conf/policy_order.yaml`. This file controls the exact order that your policies appear in the final combined PDF.
+- **Policy Order & Titles:** Open `conf/policy_order.yaml`. This file controls the exact order that your policies appear in the final combined PDF. You can also set a friendly `title` for each document, which will be used as the title of the individual PDF.
 
 - **User Map (Optional):** Open conf/usermap.json. This maps Git usernames (e.g., "todde") to a full name (e.g., "Todd Emerson") for the version history table.
 
@@ -100,11 +100,12 @@ The core of this engine is the `conf/config.yaml` file, which acts as a master
 control panel for all your policies.
 
 - **Company Variables:** Basic text replacement for names, emails, etc.
-- **PDF Metadata:** Sets the title, author, and font for the PDFs.
+- **PDF Metadata:** Sets the title, author, and fonts (main text, headers, and code blocks) for the PDFs.
 - **Feature Toggles:** Booleans (true/false) to show/hide entire sections (e.g., `show_internal_notes`).
 - **Service Types:** Nested objects to control content based on your offerings (e.g., `service_types.paas.enabled`).
 - **Compliance Frameworks:** Nested objects to show/hide policy sections based on framework (e.g., `compliance_frameworks.hipaa`).
 - **Revision History Toggles:** Controls whether the Git history is appended to the final documents.
+- **Version History Style:** Controls how the version history table is generated during a Global Release (`append` or `replace`).
 
 ### How Version History Works
 This system supports two types of versioning, both of which are controlled by your `conf/config.yaml` settings.
@@ -116,7 +117,12 @@ This stamps *all* documents with a new version and creates an official GitHub Re
 * **What to commit:** Commit the `conf/config.yaml` file. The commit message doesn't matter, but using the version number (e.g., `"v1.1.0"`) is good practice.
 * **What happens:** The build script detects that `release_version` has changed. It adds this *one* commit to the history table of *every single policy document* and creates a new GitHub Release.
 
-#### 2. Hotfix Release (For single files)
+#### 2. History Display Style (Global Releases Only)
+You can control how a Global Release affects the version history table using the `global_release_history_style` setting in `conf/config.yaml`:
+- **`append` (Default):** The new global release version is added to the top of the existing history. This maintains a complete audit trail within the document.
+- **`replace`:** The history table is wiped clean and shows *only* the new global release version. This is useful for major releases where you want to present a clean slate.
+
+#### 3. Hotfix Release (For single files)
 This adds a version history entry to *only* the specific file(s) you changed, without creating a global release.
 
 * **How to trigger:** Make a change to one or more policy files in the `policies/` directory.

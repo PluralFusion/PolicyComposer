@@ -10,14 +10,34 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      - name: List Installed Fonts
+      - name: Generate Font List
         run: |
           echo "Querying system for all available fonts..."
-          fc-list | cut -d: -f2 | sort | uniq > font_list.txt
-          echo "Font list generated."
-          
-      - name: Upload Font List Artifact
+          # We fc-list, cut to get just the font family, sort, and get unique names
+          fc-list :family | cut -d, -f1 | sort | uniq > font_list.txt
+          echo "Font list text file generated."
+
+      - name: Generate HTML Version
+        run: |
+          echo "Generating HTML version..."
+          echo "<html><head><title>Available Fonts</title><style>body { font-family: sans-serif; line-height: 1.6; padding: 2em; } ul { column-count: 3; list-style-type: none; } li { margin-bottom: 8px; font-size: 1.1em; }</style></head><body>" > font_list.html
+          echo "<h1>Available Fonts on Runner</h1><p>The font name will only render in its own typeface if you have it installed on your local machine.</p><ul>" >> font_list.html
+          # This loop now wraps each font name in a span with a style tag
+          while read line; do echo "<li><span style=\"font-family: '$line';\">$line</span></li>"; done < font_list.txt >> font_list.html
+          echo "</ul></body></html>" >> font_list.html
+          echo "Font list HTML file generated."
+
+      - name: Print List to Log
+        run: |
+          echo "--- START: AVAILABLE FONT LIST ---"
+          cat font_list.txt
+          echo "---  END: AVAILABLE FONT LIST  ---"
+
+      - name: Upload Font Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: available-fonts
-          path: font_list.txt
+          path: |
+            font_list.txt
+            font_list.html
+

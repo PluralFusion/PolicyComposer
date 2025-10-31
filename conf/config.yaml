@@ -54,6 +54,12 @@ md_show_revision_history: true
 pdf_show_revision_history: true
 combined_pdf_show_revision_history: false
 
+# On a global release, should the new version REPLACE all previous history,
+# or be APPENDED to it?
+# - "append" (default): Adds the new global release to the top of existing hotfixes.
+# - "replace": Wipes all previous history and shows only the new global release.
+global_release_history_style: "append"
+
 
 ## Content Controls
 show_internal_notes: true

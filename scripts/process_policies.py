@@ -44,9 +44,9 @@ print(f"Loading history from {history_file}")
 try:
     with open(history_file, 'r') as f:
         history_data = json.load(f)
-    CURRENT_BUILD_COMMIT = history_data.get('current_build_commit')
+    CURRENT_BUILD_COMMIT = history_data.get('current_build_commit')    
+    FILE_HISTORY = history_data.get('file_history', {})    
     IS_GLOBAL_RELEASE = history_data.get('is_global_release', False)
-    FILE_HISTORY = history_data.get('file_history', {})
 except Exception as e:
     print(f"Could not load history file: {e}")
     CURRENT_BUILD_COMMIT = None
@@ -58,49 +58,69 @@ env = Environment(loader=FileSystemLoader(policy_dir))
 processed_for_combined_pdf = []
 
 # --- Helper Function to Generate History Table ---
-def get_history_table(policy_filename, config):
-    # Get the prefix for hotfixes
-    release_prefix = config.get('release_commit_prefix', 'RELEASE:')
-    
+def get_history_table(policy_filename):
     # 1. Get the list of commits that *only* touched this file
-    all_commits = FILE_HISTORY.get(policy_filename, [])
-    
-    # 2. Filter for hotfixes: commits that *match* the prefix
-    commits = [c for c in all_commits if c['subject'].startswith(release_prefix)]
+    commits = FILE_HISTORY.get(policy_filename, [])
     
     if not CURRENT_BUILD_COMMIT:
         return "" # Can't build history if build commit info is missing
 
-    # 3. If this is a global release, add the current commit to the top
-    #    (regardless of its prefix)
+    # 2. Handle Global Release based on the configured style
     if IS_GLOBAL_RELEASE:
-        print(f"  -> Adding global release commit {CURRENT_BUILD_COMMIT['hash'][:7]} to history")
-        # Add to top, but check if it's already in the hotfix list to avoid duplicates
-        if not any(c['hash'] == CURRENT_BUILD_COMMIT['hash'] for c in commits):
+        print(f"  -> Global release detected. Stamping with commit {CURRENT_BUILD_COMMIT['hash'][:7]}")
+        
+        # Add the global commit to the history for every file.
+        if not any(commit['hash'] == CURRENT_BUILD_COMMIT['hash'] for commit in commits):
             commits.insert(0, CURRENT_BUILD_COMMIT)
+        
+        # Check the style: 'replace' or 'append'
+        history_style = config.get('global_release_history_style', 'append')
+        if history_style == 'replace':
+            print("     -> History style is 'replace'. Showing only the global release commit.")
+            # Filter to *only* the global release commit
+            commits = [c for c in commits if c['hash'] == CURRENT_BUILD_COMMIT['hash']]
+            # Early exit, no need to check for other hotfixes
+            return build_markdown_table(commits)
+
+    # 3. Filter the final list to include only valid release commits.
+    # A commit is included if:
+    #   a) It is the current global release commit (if applicable).
+    #   b) Its subject starts with the release/hotfix prefix.
+    prefix = config.get('release_commit_prefix', 'RELEASE:')
+    commits = [c for c in commits if c['subject'].startswith(prefix) or (IS_GLOBAL_RELEASE and c['hash'] == CURRENT_BUILD_COMMIT['hash'])]
     
-    # If no release commits are found, don't build a table
     if not commits:
         return ""
 
     # 4. Build the markdown table
+    return build_markdown_table(commits)
+
+def build_markdown_table(commits):
+    """Helper function to build the markdown table from a list of commits."""
     table = "\n\n## Version History\n\n"
     table += "| Date | Updated By | Commit | Comments |\n"
     table += "| :--- | :--- | :--- | :--- |\n"
     
     for commit in commits:
         hash_short = commit['hash'][:7]
-        # We'd need the repo URL from config to make this a link
         table += f"| {commit['date']} | {commit['author_name']} | {hash_short} | {commit['subject']} |\n"
         
     return table
 
 # --- 4. Process Each Policy File ---
 print(f"Processing {len(POLICY_FILES_LIST)} policy files from {order_file}...")
+
+# --- Get PDF Font settings from config ---
+pdf_font = config.get('pdf_main_font', 'Noto Sans')
+pdf_header_font = config.get('pdf_header_font', pdf_font) # Default to main font if not set
+pdf_code_font = config.get('pdf_code_font', 'Noto Sans Mono') # Good default
+
 for policy_item in POLICY_FILES_LIST:
     try:
         policy_filename = policy_item['source']
         output_filename_template = policy_item['output']
+        # Get the new 'title' field, default to the output filename
+        policy_title_template = policy_item.get('title', output_filename_template.replace('.md', ''))
     except (TypeError, KeyError):
         print(f"  -> WARNING: Skipping malformed item in {order_file}. Must be a list of objects with 'source' and 'output' keys.")
         print(f"     Item: {policy_item}")
@@ -109,7 +129,12 @@ for policy_item in POLICY_FILES_LIST:
     # Render the *output* filename
     filename_template = Template(output_filename_template)
     rendered_filename = filename_template.render(config)
-    print(f"Processing: {policy_filename}  ->  Output: {rendered_filename}")
+    
+    # Render the *PDF title*
+    title_template = Template(policy_title_template)
+    rendered_title = title_template.render(config)
+
+    print(f"Processing: {policy_filename}  ->  Output: {rendered_filename}  (Title: {rendered_title})")
 
     try:
         # 1. Render Jinja2 template (use the *source* filename)
@@ -117,7 +142,7 @@ for policy_item in POLICY_FILES_LIST:
         rendered_content = template.render(config)
         
         # 2. Generate history table (use *source* filename to look up)
-        history_table = get_history_table(policy_filename, config)
+        history_table = get_history_table(policy_filename)
         
         # 3. Apply history based on config toggles
         md_content = rendered_content
@@ -143,17 +168,18 @@ for policy_item in POLICY_FILES_LIST:
         
         print(f"  -> Converting to individual PDF: {pdf_path}")
         
-        # Get PDF font from config, default to "Noto Sans"
-        pdf_font = config.get('pdf_main_font', 'Noto Sans')
-        
-        pandoc_pdf_cmd = [
-            'pandoc', '-o', pdf_path,
-            '--metadata', f"title={rendered_filename.replace('.md', '')}",
-            '--variable', f"mainfont={pdf_font}"
+        pandoc_cmd_individual = [
+            'pandoc',
+            '--from=gfm', # Use GitHub Flavored Markdown (fixes bullets)
+            '-o', pdf_path,
+            '--metadata', f"title={rendered_title}", # Use friendly title
+            '--variable', f"mainfont={pdf_font}",
+            '--variable', f"sansfont={pdf_header_font}", # Set header font
+            '--variable', f"monofont={pdf_code_font}"  # Set code font
         ]
         
         subprocess.run(
-            pandoc_pdf_cmd,
+            pandoc_cmd_individual,
             input=pdf_content.encode('utf-8'),
             check=True
         )
@@ -175,21 +201,23 @@ print(f"Creating combined PDF: {combined_pdf_path}")
 
 combined_pdf_title = config.get('combined_pdf_title', 'Company Policy Manual')
 combined_pdf_author = config.get('combined_pdf_author', config.get('company_name', 'Company'))
-pdf_font = config.get('pdf_main_font', 'Noto Sans')
 
 try:
-    pandoc_cmd = [
+    pandoc_cmd_combined = [
         'pandoc',
+        '--from=gfm', # Use GitHub Flavored Markdown (fixes bullets)
         '-o', combined_pdf_path,
         '--table-of-contents',
         '--toc-depth=2',
         '--number-sections',
         '--metadata', f"title={combined_pdf_title}",
         '--metadata', f"author={combined_pdf_author}",
-        '--variable', f"mainfont={pdf_font}"
+        '--variable', f"mainfont={pdf_font}",
+        '--variable', f"sansfont={pdf_header_font}",
+        '--variable', f"monofont={pdf_code_font}"
     ] + processed_for_combined_pdf
     
-    subprocess.run(pandoc_cmd, check=True)
+    subprocess.run(pandoc_cmd_combined, check=True)
     
 except Exception as e:
     print(f"ERROR creating combined PDF: {e}")

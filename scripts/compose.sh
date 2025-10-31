@@ -78,13 +78,14 @@ export CURRENT_COMMIT_MSG=$(git log -1 --pretty=format:%s)
 export IS_GLOBAL_RELEASE="false"
 
 # Check if config.yaml was part of the last commit
-# Use '|| true' to prevent failure on first commit (no HEAD~1)
-if git diff --name-only HEAD~1 HEAD 2>/dev/null | grep -q "$CONFIG_FILE"; then
-  echo "$CONFIG_FILE was changed in the last commit."
+# This logic compares the current config.yaml with the one from the last commit
+# on the main/master branch, which is more robust for local development.
+if git diff origin/main --name-only | grep -q "$CONFIG_FILE"; then
+  echo "$CONFIG_FILE has changed since the last pull from origin/main."
   
   # Get old and new version values from git
-  # Use '|| echo "none"' to handle file not existing in HEAD~1
-  OLD_VERSION=$(git show HEAD~1:"$CONFIG_FILE" 2>/dev/null | grep "$RELEASE_VERSION_KEY" | awk '{print $2}' | tr -d '"' || echo "none")
+  # Use '|| echo "none"' to handle file not existing in the main branch history
+  OLD_VERSION=$(git show origin/main:"$CONFIG_FILE" 2>/dev/null | grep "$RELEASE_VERSION_KEY" | awk '{print $2}' | tr -d '"' || echo "none")
   NEW_VERSION=$(grep "$RELEASE_VERSION_KEY" "$CONFIG_FILE" | awk '{print $2}' | tr -d '"')
   
   if [ "$OLD_VERSION" != "$NEW_VERSION" ] && [ -n "$NEW_VERSION" ]; then
@@ -94,7 +95,7 @@ if git diff --name-only HEAD~1 HEAD 2>/dev/null | grep -q "$CONFIG_FILE"; then
     echo "$CONFIG_FILE changed, but release_version is the same."
   fi
 else
-  echo "$CONFIG_FILE was not changed. This is not a global release."
+  echo "$CONFIG_FILE has not changed since origin/main. This is not a global release."
 fi
 # --- End Check for Global Release ---
 
@@ -110,4 +111,3 @@ echo "------------------------------------------------------------"
 echo "Build complete."
 echo "Your files are available in the 'md/' and 'pdf/' directories."
 echo "------------------------------------------------------------"
-
