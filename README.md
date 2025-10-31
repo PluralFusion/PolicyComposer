@@ -9,7 +9,7 @@ The policy templates in the `policies/` directory were originally based on the C
 ## How to Use This Project
 There are two ways to generate your policy documents:
 
-1. **GitHub Action (Recommended):** This is the easiest method. You push your changes to GitHub, and a pre-configured virtual machine builds your documents and provides them as downloadable .zip files. This works on any operating system.
+1. **GitHub Action (Recommended):** This is the easiest method. You push your changes to GitHub, and a pre-configured virtual machine builds your documents and provides them as downloadable **.zip** files. This works on any operating system.
 
 2. **Run Locally (Advanced):** This method runs the build scripts directly on your own computer. This is faster but requires you to install all the necessary dependencies. This script is designed for **Linux and macOS** users; it is **not supported on Windows**.
 
@@ -27,7 +27,7 @@ git clone https://github.com/PluralFusion/PolicyComposer.git
 ```
 
 #### Step 3: Create Your Private Configuration
-The conf/ directory contains all the files needed to customize your policies.
+The `conf/` directory contains all the files needed to customize your policies.
 
 - **Main Configuration:** Copy the example config to create your private config. 
    ```bash 
@@ -42,7 +42,7 @@ The conf/ directory contains all the files needed to customize your policies.
 #### Step 4: Edit Your Policies
 Modify the source .md files in the `policies/` directory. You can use Jinja2  
 syntax (e.g., `{{ company\_name }}` or `{% if hipaa %}...{% endif %}`)  
-to insert variables or logic from your config.yaml. <br/>**See the [Templating Guide](https://www.google.com/search?q=docs/templating_guide.md) for detailed examples.**
+to insert variables or logic from your config.yaml. <br/>**See the [Templating Guide](docs/templating_guide.md) for detailed examples.**
 
 #### **Step 5: Push to Your Private Repository**
 Change the Git remote to point to the new private repository you created in Step 1\.  
@@ -54,73 +54,83 @@ Pushing to the main branch will automatically trigger the GitHub Action.
 
 #### **Step 6: Download Your Documents**
 When the action is complete (a green checkmark on your commit), go to your  
-repository's "Actions" tab and click on the latest workflow run. You will find  
-your processed documents available to download as "Artifacts":
+repository's **"Actions"** tab and click on the latest workflow run. You will find  
+your processed documents available to download as **"Artifacts"**:
 
-- **processed-markdown-policies**: A .zip of the final .md files.
-- **policy-pdfs**: A .zip containing the individual .pdf files and combined\_policies.pdf.
-- **available-fonts**: A font\_list.txt file showing all fonts you can use in your config.
+- **processed-markdown-policies**: A **.zip** of the final **.md **files.
+- **policy-pdfs**: A **.zip** containing the individual **.pdf** files and **`combined_policies.pdf`**.
+- **available-fonts**: A **font\_list.txt** file showing all fonts you can use in your config.
 
 ### **Method 2: Running the Build Locally (Advanced - NOT FULLY TESTED)**
 This method is for **Linux and macOS** users who want to build and test documents on their local machine without pushing to GitHub.
 
 #### **Step 1: Install Dependencies**
 
-The build script scripts/compose.sh will check for dependencies, but it cannot install system-level tools for you. You must first install:
+The build script `cripts/compose.sh`will check for dependencies, but it cannot install system-level tools for you. You must first install:
 
 - **Python 3** & **Pip 3**
 - **Git**
 - **Pandoc**
 - **A LaTeX Distribution:**
-  - On macOS: brew install \--cask mactex
-  - On Debian/Ubuntu: sudo apt-get install texlive-latex-base
+  - On macOS: `brew install --cask mactex`
+  - On Debian/Ubuntu: `sudo apt-get install texlive-latex-base`
 
 #### **Step 2: Run the Composer Script**
 
-The compose.sh script will automatically check for any missing dependencies and Python packages (like PyYAML or Jinja2) and ask to install them. It will then build all the documents.
+The `compose.sh` script will automatically check for any missing dependencies and Python packages (like PyYAML or Jinja2) and ask to install them. It will then build all the documents.
 
 1. **Make the script executable** (you only need to do this once):  
+  ```bash
   chmod \+x scripts/compose.sh
+  ```
 2. **Run the script** from the root of the project:  
+  ```bash
   ./scripts/compose.sh
+  ```
 
 #### **Step 3: Access Your Files**
-
 The script will run the exact same build process as the GitHub Action. When it's finished, you won't get "artifacts." Instead, the files will be placed directly in your project folder:
 
-- The processed markdown files will be in the md/ directory.
-- The generated PDFs will be in the pdf/ directory.
+- The processed markdown files will be in the `md/` directory.
+- The generated PDFs will be in the `pdf/` directory.
 
 ## **Configuration Overview**
 
-The core of this engine is the conf/config.yaml file, which acts as a master  
+The core of this engine is the `conf/config.yaml` file, which acts as a master  
 control panel for all your policies.
 
 - **Company Variables:** Basic text replacement for names, emails, etc.
 - **PDF Metadata:** Sets the title, author, and font for the PDFs.
-- **Feature Toggles:** Booleans (true/false) to show/hide entire sections (e.g., show\_internal\_notes).
-- **Service Types:** Nested objects to control content based on your offerings (e.g., service\_types.paas.enabled).
-- **Compliance Frameworks:** Nested objects to show/hide policy sections based on framework (e.g., compliance\_frameworks.hipaa).
+- **Feature Toggles:** Booleans (true/false) to show/hide entire sections (e.g., `show_internal_notes`).
+- **Service Types:** Nested objects to control content based on your offerings (e.g., `service_types.paas.enabled`).
+- **Compliance Frameworks:** Nested objects to show/hide policy sections based on framework (e.g., `compliance_frameworks.hipaa`).
 - **Revision History Toggles:** Controls whether the Git history is appended to the final documents.
 
-## **Version History Control**
+### How Version History Works
+This system supports two types of versioning, both of which are controlled by your `conf/config.yaml` settings.
 
-The build script generates a version history table at the end of your documents if you have `..._show_revision_history`: true in your config.  
-By default, this table is populated only by commits that start with a specific prefix (default is RELEASE:). This keeps your history clean of minor typo fixes.
+#### 1. Global Release (Recommended Method)
+This stamps *all* documents with a new version and creates an official GitHub Release with your PDFs.
 
-- **To version-stamp ONE file:** Make your changes to that file and commit with the prefix.  
-  git commit \-m "RELEASE: v1.1 update to risk policy"
-- **To version-stamp ALL files (e.g., for a major release):** Make a commit that *only* changes the `conf/config.yaml` file (e.g., update a version number or add a comment) and use the RELEASE: prefix.  
-   ```bash
-  git commit -m "RELEASE: v2.0 - 2025 Annual Policy Review"  
-  ```
-  The script will see this config-only change and apply this commit to *every document's* history table.
+* **How to trigger:** Simply change the `release_version` variable in your `conf/config.yaml` (e.g., from `"v1.0.0"` to `"v1.1.0"`).
+* **What to commit:** Commit the `conf/config.yaml` file. The commit message doesn't matter, but using the version number (e.g., `"v1.1.0"`) is good practice.
+* **What happens:** The build script detects that `release_version` has changed. It adds this *one* commit to the history table of *every single policy document* and creates a new GitHub Release.
+
+#### 2. Hotfix Release (For single files)
+This adds a version history entry to *only* the specific file(s) you changed, without creating a global release.
+
+* **How to trigger:** Make a change to one or more policy files in the `policies/` directory.
+* **What to commit:** Commit the changed policy files with a message that **starts with** your `release_commit_prefix` (e.g., `"RELEASE:"`).
+    ```bash
+    git commit -m "RELEASE: Fixed typo in risk_management_policy"
+    ```
+* **What happens:** The build script sees this commit, checks the prefix, and adds this commit *only* to the history table of the `risk_management_policy`. It does **not** create a GitHub Release.
 
 ## **Template Documentation**
 The markdown documents are formatted to be updated based on changes to the \`conf/config.yaml\` file. 
 
-- **Templating:** For a detailed guide on using Jinja2 logic (if, for, etc.), see [docs/templating\_guide.md](https://www.google.com/search?q=docs/templating_guide.md).
-- **Config Validation:** This project includes a script to help you check your config for errors. See [docs/CONFIG\_VALIDATION.md](https://www.google.com/search?q=docs/CONFIG_VALIDATION.md) for details.
+- **Templating:** For a detailed guide on using Jinja2 logic (if, for, etc.), see [docs/templating_guide.md](docs/templating_guide.md).
+- **Config Validation:** This project includes a script to help you check your config for errors. See [docs/CONFIG_VALIDATION.md](docs/CONFIG_VALIDATION.md) for details.
 
 ## **License**
 
@@ -129,4 +139,4 @@ This project uses a hybrid licensing model:
 - **The Software** (all .py, .yml, .github/workflows files) is licensed under the MIT License.
 - **The Content** (the .md policy files) is licensed under the CC BY-SA 4.0 License, as it is a derivative of the original Catalyze policies.
 
-See the [LICENSE.md](http://docs.google.com/license.md) file for full details.
+See the [LICENSE.md](LICENSE.md) file for full details.

@@ -1,114 +1,222 @@
-#!/usr/bin/env python3
-"""
-Validate `conf/config.yaml` for canonical PHI flag consistency.
-
-Checks:
- - Looks for `ephi_access` canonical flag
- - Computes derived PHI presence from known per-service flags
- - Reports mismatches and optionally fixes the config when --fix is provided
-
-Usage:
-  python3 scripts/validate_config.py [--config conf/config.yaml] [--fix]
-
-Exit codes:
- 0 - OK (no mismatch)
- 1 - Mismatch detected (or validation error)
- 2 - Fatal error (file I/O / parse error)
-"""
-import argparse
-import sys
+import os
 import yaml
-from pathlib import Path
+from jinja2 import Environment, FileSystemLoader, Template
+import subprocess
+import json
 
-KNOWN_PHI_FLAGS = [
-    'saas_phi_access',
-    'paas_phi_access',
-    'medical_device_phi_access',
-    'mobile_app_phi_access',
-]
+# --- 1. Setup ---
+print("Starting policy build process...")
+config_path = 'conf/config.yaml'
+policy_dir = 'policies'
+order_file = 'conf/policy_order.yaml' 
+history_file = 'build/git_history.json'
 
+# Output directories
+md_output_dir = 'md'
+pdf_output_dir = 'pdf'
+temp_combined_dir = 'temp_combined'
 
-def load_config(path):
-    try:
-        with open(path, 'r') as f:
-            return yaml.safe_load(f) or {}
-    except Exception as e:
-        print(f"Error reading config file '{path}': {e}", file=sys.stderr)
-        sys.exit(2)
+os.makedirs(md_output_dir, exist_ok=True)
+os.makedirs(pdf_output_dir, exist_ok=True)
+os.makedirs(temp_combined_dir, exist_ok=True)
 
+# --- 2. Load Config & History ---
+print(f"Loading config from {config_path}")
+with open(config_path, 'r') as f:
+    config = yaml.safe_load(f)
 
-def write_config(path, data):
-    try:
-        with open(path, 'w') as f:
-            yaml.safe_dump(data, f, sort_keys=False)
-    except Exception as e:
-        print(f"Error writing config file '{path}': {e}", file=sys.stderr)
-        sys.exit(2)
+# Load the policy order config
+print(f"Loading policy order from {order_file}")
+try:
+    with open(order_file, 'r') as f:
+        policy_order_config = yaml.safe_load(f)
+    POLICY_FILES_LIST = policy_order_config.get('policy_files', [])
+except Exception as e:
+    print(f"ERROR: Could not load or parse {order_file}: {e}")
+    exit(1)
 
+print(f"Loading history from {history_file}")
+try:
+    with open(history_file, 'r') as f:
+        history_data = json.load(f)
+    CURRENT_BUILD_COMMIT = history_data.get('current_build_commit')
+    FILE_HISTORY = history_data.get('file_history', {})
+    IS_GLOBAL_RELEASE = history_data.get('is_global_release', False)
+except Exception as e:
+    print(f"Could not load history file: {e}")
+    CURRENT_BUILD_COMMIT = None
+    FILE_HISTORY = {}
+    IS_GLOBAL_RELEASE = False
 
-def main():
-    p = argparse.ArgumentParser(description='Validate config PHI flags')
-    p.add_argument('--config', '-c', default='conf/config.yaml', help='Path to config.yaml')
-    p.add_argument('--fix', action='store_true', help='If provided, update config.yaml to set ephi_access to derived value')
-    args = p.parse_args()
+# --- 3. Setup Jinja2 ---
+env = Environment(loader=FileSystemLoader(policy_dir))
+processed_for_combined_pdf = []
 
-    config_path = Path(args.config)
-    config = load_config(config_path)
+# --- Helper Function to Generate History Table ---
+def get_history_table(policy_filename):
+    # 1. Get the list of commits that *only* touched this file
+    commits = FILE_HISTORY.get(policy_filename, [])
+    
+    if not CURRENT_BUILD_COMMIT:
+        return "" # Can't build history if build commit info is missing
 
-    # Find any keys that mention 'phi' (case-insensitive)
-    phi_like_keys = [k for k in config.keys() if 'phi' in k.lower()]
+    # 2. Check if this is a global release
+    if IS_GLOBAL_RELEASE:
+        print(f"  -> Global release detected. Stamping with commit {CURRENT_BUILD_COMMIT['hash'][:7]}")
+        # For a global release, we *only* show the global release commit.
+        # We also check if the global commit is *already* in the file history (if the config was the *only* thing committed)
+        # This logic ensures the global commit is added, and it's the *only* one if it's a global release.
+        
+        # Check if the global commit is already in the file's history
+        found_in_history = False
+        for commit in commits:
+             if commit['hash'] == CURRENT_BUILD_COMMIT['hash']:
+                found_in_history = True
+                break
+        
+        # If the global commit wasn't in the file's history, add it.
+        # This is the key logic for stamping config-only changes.
+        if not found_in_history:
+             commits.insert(0, CURRENT_BUILD_COMMIT)
+             
+        # Now, filter *only* for the global release commit
+        commits = [c for c in commits if c['hash'] == CURRENT_BUILD_COMMIT['hash']]
 
-    print(f"Found PHI-like keys in config: {phi_like_keys}")
-
-    # Compute derived value from known flags
-    derived = False
-    found_known = {}
-    for k in KNOWN_PHI_FLAGS:
-        val = bool(config.get(k, False))
-        found_known[k] = val
-        if val:
-            derived = True
-
-    print('Per-service PHI flags:')
-    for k, v in found_known.items():
-        print(f'  {k}: {v}')
-
-    print(f'Computed derived ephi_access = {derived}')
-
-    # Check canonical flag
-    canonical_exists = 'ephi_access' in config
-    canonical_val = bool(config.get('ephi_access', False))
-    if canonical_exists:
-        print(f"Canonical 'ephi_access' found: {canonical_val}")
     else:
-        print("Canonical 'ephi_access' not found in config.")
+        # 3. Not a global release, so filter by the commit prefix
+        prefix = config.get('release_commit_prefix', 'RELEASE:')
+        commits = [c for c in commits if c['subject'].startswith(prefix)]
 
-    if canonical_exists and canonical_val == derived:
-        print('OK: canonical flag matches derived value.')
-        sys.exit(0)
+    # 4. Build the markdown table
+    if not commits:
+        return "" # No history to show
 
-    # Mismatch or missing
-    print('\nWARNING: Canonical ephi_access does not match derived per-service flags (or is missing).')
-    if canonical_exists:
-        print(f"  ephi_access={canonical_val} but derived={derived}")
-    else:
-        print(f"  ephi_access missing; derived={derived}")
+    table = "\n\n## Version History\n\n"
+    table += "| Date | Updated By | Commit | Comments |\n"
+    table += "| :--- | :--- | :--- | :--- |\n"
+    
+    for commit in commits:
+        hash_short = commit['hash'][:7]
+        # We'd need the repo URL from config to make this a link
+        table += f"| {commit['date']} | {commit['author_name']} | {hash_short} | {commit['subject']} |\n"
+        
+    return table
 
-    print('\nRecommended action:')
-    print(f"  - Set 'ephi_access' to {derived} in {config_path}")
-    print('  - Or adjust per-service PHI flags to reflect reality')
+# --- 4. Process Each Policy File ---
+print(f"Processing {len(POLICY_FILES_LIST)} policy files from {order_file}...")
 
-    if args.fix:
-        print('\n--fix provided; updating config file...')
-        config['ephi_access'] = derived
-        write_config(config_path, config)
-        print('Config updated.')
-        # fall through with exit code 0 if fix applied
-        sys.exit(0)
+# --- Get PDF Font settings from config ---
+pdf_font = config.get('pdf_main_font', 'Noto Sans')
+pdf_header_font = config.get('pdf_header_font', pdf_font) # Default to main font if not set
+pdf_code_font = config.get('pdf_code_font', 'Noto Sans Mono') # Good default
 
-    # non-fixed mismatch
-    sys.exit(1)
+for policy_item in POLICY_FILES_LIST:
+    try:
+        policy_filename = policy_item['source']
+        output_filename_template = policy_item['output']
+        # Get the new 'title' field, default to the output filename
+        policy_title_template = policy_item.get('title', output_filename_template.replace('.md', ''))
+    except (TypeError, KeyError):
+        print(f"  -> WARNING: Skipping malformed item in {order_file}. Must be a list of objects with 'source' and 'output' keys.")
+        print(f"     Item: {policy_item}")
+        continue
+        
+    # Render the *output* filename
+    filename_template = Template(output_filename_template)
+    rendered_filename = filename_template.render(config)
+    
+    # Render the *PDF title*
+    title_template = Template(policy_title_template)
+    rendered_title = title_template.render(config)
 
+    print(f"Processing: {policy_filename}  ->  Output: {rendered_filename}  (Title: {rendered_title})")
 
-if __name__ == '__main__':
-    main()
+    try:
+        # 1. Render Jinja2 template (use the *source* filename)
+        template = env.get_template(policy_filename)
+        rendered_content = template.render(config)
+        
+        # 2. Generate history table (use *source* filename to look up)
+        history_table = get_history_table(policy_filename)
+        
+        # 3. Apply history based on config toggles
+        md_content = rendered_content
+        if config.get('md_show_revision_history', False):
+            md_content += history_table
+        
+        pdf_content = rendered_content
+        if config.get('pdf_show_revision_history', False):
+            pdf_content += history_table
+            
+        combined_content = rendered_content
+        if config.get('combined_pdf_show_revision_history', False):
+            combined_content += history_table
+
+        # 5. Save Processed Markdown
+        md_path = os.path.join(md_output_dir, rendered_filename)
+        with open(md_path, 'w') as out_f:
+            out_f.write(md_content)
+
+        # 6. Create Individual PDF
+        pdf_filename = rendered_filename.replace('.md', '.pdf')
+        pdf_path = os.path.join(pdf_output_dir, pdf_filename)
+        
+        print(f"  -> Converting to individual PDF: {pdf_path}")
+        
+        pandoc_cmd_individual = [
+            'pandoc',
+            '--from=gfm', # Use GitHub Flavored Markdown (fixes bullets)
+            '-o', pdf_path,
+            '--metadata', f"title={rendered_title}", # Use friendly title
+            '--variable', f"mainfont={pdf_font}",
+            '--variable', f"sansfont={pdf_header_font}", # Set header font
+            '--variable', f"monofont={pdf_code_font}"  # Set code font
+        ]
+        
+        subprocess.run(
+            pandoc_cmd_individual,
+            input=pdf_content.encode('utf-8'),
+            check=True
+        )
+        
+        # 7. Save file for Combined PDF
+        temp_combined_path = os.path.join(temp_combined_dir, rendered_filename)
+        with open(temp_combined_path, 'w') as out_f:
+            out_f.write(combined_content)
+        processed_for_combined_pdf.append(temp_combined_path)
+
+    except Exception as e:
+        # This will catch the 'template not found' error if the source file is wrong
+        print(f"ERROR processing {policy_filename}: {e}")
+        exit(1)
+
+# --- 8. Create Final Combined PDF ---
+combined_pdf_path = os.path.join(pdf_output_dir, 'combined_policies.pdf')
+print(f"Creating combined PDF: {combined_pdf_path}")
+
+combined_pdf_title = config.get('combined_pdf_title', 'Company Policy Manual')
+combined_pdf_author = config.get('combined_pdf_author', config.get('company_name', 'Company'))
+
+try:
+    pandoc_cmd_combined = [
+        'pandoc',
+        '--from=gfm', # Use GitHub Flavored Markdown (fixes bullets)
+        '-o', combined_pdf_path,
+        '--table-of-contents',
+        '--toc-depth=2',
+        '--number-sections',
+        '--metadata', f"title={combined_pdf_title}",
+        '--metadata', f"author={combined_pdf_author}",
+        '--variable', f"mainfont={pdf_font}",
+        '--variable', f"sansfont={pdf_header_font}",
+        '--variable', f"monofont={pdf_code_font}"
+    ] + processed_for_combined_pdf
+    
+    subprocess.run(pandoc_cmd_combined, check=True)
+    
+except Exception as e:
+    print(f"ERROR creating combined PDF: {e}")
+    exit(1)
+
+print("Policy build process completed successfully.")
+
