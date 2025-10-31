@@ -42,7 +42,7 @@ review_committee:
 # This value is the *current* official version of the policy set.
 # Updating this (e.g., from "v1.0.0" to "v1.1.0") will trigger
 # a new global release for ALL documents.
-release_version: "v.0.0.1"
+release_version: "v.0.0.2"
 
 # This prefix is for "hotfix" commits that only apply to a *single* file.
 # It is ignored during a global 'release_version' change.
