@@ -1,96 +1,111 @@
 # PolicyComposer: A Company Policy Document Engine
-This repository provides a complete build system for creating, managing, and versioning company policies. It uses a Jinja2 templating engine, a Python build script, and GitHub Actions to automatically generate versioned MD and PDF policy documents.
+
+This repository provides a complete build system for creating, managing, and versioning
+company policies. It uses a Jinja2 templating engine, a Python build script,
+and GitHub Actions to automatically generate versioned MD and PDF policy documents.
 
 ## Original Content Attribution
 
-The policy templates in the `/policy` directory are based on the  
-[Catalyze HIPAA Compliance Policies](https://github.com/globerhofer/HIPAA-policies) by Catalyze, Inc., which are licensed under a Creative Commons Attribution-ShareAlike 4.0 International License.
+The policy templates in the `policies/` directory are based on the
+[Catalyze HIPAA Compliance Policies](https://github.com/globerhofer/HIPAA-policies)
+by Catalyze, Inc., which are licensed under a
+[Creative Commons Attribution-ShareAlike 4.0 International License](http://creativecommons.org/licenses/by-sa/4.0/).
 
 ## !! IMPORTANT: How to Use This Project !!
 
-**NOTE:** This repository is a **template**. The GitHub Action build process requires that you commit and push your `conf/config.yml` file, which will contain your company's private information.
+**NOTE:** This repository is a **template**. The GitHub Action build process requires that you commit and push your configuration files (like `conf/config.yaml`), which will contain your company's private information.
 
 **You MUST use this template in a new, PRIVATE repository to protect your configuration.**
 
+## Step-by-Step Instructions
 
-1. **Create a New PRIVATE Repository**
-On GitHub, create a new repository and make sure to select Private in the visibility settings.
+### Step 1: Create a New Private Repository
 
-2. **Clone the Repository**  
-   `git clone https://github.com/PluralFusion/PolicyComposer`
+On GitHub, create a new repository. Make sure to select **Private** for the visibility.
 
-3. **Configure Your Company**
-   Copy the example config file to create your own config.
-   ```bash
-   cp conf/config_example.yml conf/config.yml
-   ```
+### Step 2: Clone This Template Repository
 
-4. **Edit Your Config**
-   Open `conf/config.yml` (the new file) and fill in all your company's specific information (names, emails, compliance toggles, etc.). You can add any values that you'd like to include in your policy documentation.
+Clone this `PolicyComposer` repository to your local machine.
+```bash
+git clone https://github.com/PluralFusion/PolicyComposer.git
+```
 
-3. **Edit Policies**
-   Modify the source files in the `/policy` directory. You can use Jinja2  
-   syntax (e.g.,  `{{ company_name }}` or   `{% if hipaa %}` ...   `{% endif %} `)  
-   to insert variables or logic from your config.yml.  
-   **See the [Templating Guide](/docs/templating_guide.md) for detailed examples.**  
+*Note: You will later change the remote URL to point to your new private repository.*
 
-4. **Define Policy Order**
-   Edit `/conf/policy_order.txt` to list the markdown filenames from the  
-   `/policy` directory in the exact order you want them to appear in the  
-   combined PDF.  
+### Step 3: Create Your Private Configuration
 
-5. **(Optional) Edit User Map for Version History**
-   If you have md_show_revision_history or similar toggles in your config
-   set to true, the build script will generate a version history table
-   from your git log.
+The `conf/` directory contains all the files needed to customize your policies.
 
-   This script will try to map the author name from Git (e.g., github-username)
-   to a real name (e.g., "Jane Doe").
+1. **Main Configuration:** Copy the example config to create your private config.
 
-   To configure this, open conf/usermap.json and add your team's Git usernames
-   and their corresponding full names:
+```bash
+cp conf/config-example.yaml conf/config.yaml
+```
 
-   ```json
-   {
-   "github-username": "Jane Doe",
-   "another-user": "John Smith",
-   "todde": "Todd Emerson"
-   }
-   ```
+Now, edit `conf/config.yaml` and fill in all your company's specific information (names, emails, compliance toggles, etc.).
 
-   If a user isn't found in this map, their Git username will be used in the table.
+2. **Policy Order:** Open `conf/policy_order.yaml`. This file controls the exact order that your policies appear in the final combined PDF. You can add, remove, or reorder the files here. The `source` must match the filename in `policies/`.
 
-5. **Push Changes to your PRIVATE repo**
-   Commit and push your changes to the main branch. A GitHub Action will  
-   automatically run.  
+3. **User Map (Optional):** Open `conf/usermap.json`. If you enable version history in your config, this file maps Git usernames (e.g., "todde") to a full name (e.g., "Todd Emerson") for the history table.
 
-6. **Download Your Documents** 
-   When the action is complete (a green checkmark on your commit), go to the  
-   "Actions" tab and click on the latest workflow run. You will find your  
-   processed documents as "Artifacts":  
-   * **processed-markdown-policies**: A .zip of the final .md files.  
-   * **policy-pdfs**: A .zip containing both the individual .pdf files and the final `combined_policies.pdf`.
+### Step 4: Edit Your Policies
+
+Modify the source `.md` files in the `policies/` directory. You can use Jinja2
+syntax (e.g., `{{ company_name }}` or `{% if hipaa %}...{% endif %}`)
+to insert variables or logic from your `config.yaml`.
+
+**See the [Templating Guide](https://www.google.com/search?q=docs/templating_guide.md) for detailed examples.**
+
+### Step 5: Push to Your Private Repository
+
+Change the Git remote to point to the new private repository you created in Step 1.
+
+```bash
+git remote set-url origin https://github.com/YOUR-USERNAME/YOUR-PRIVATE-REPO.git git push -u origin main
+```
+
+
+Pushing to the `main` branch will automatically trigger the GitHub Action.
+
+### Step 6: Download Your Documents
+
+When the action is complete (a green checkmark on your commit), go to your
+repository's "Actions" tab and click on the latest workflow run. You will find
+your processed documents available to download as "Artifacts":
+
+* **`processed-markdown-policies`**: A `.zip` of the final `.md` files.
+
+* **`policy-pdfs`**: A `.zip` containing both the individual `.pdf` files and the final `combined_policies.pdf`.
 
 ## Configuration Overview
-The core of this engine is the `conf/config.yml` file, which acts as a master  
-control panel for all your policies. The build script passes all variables  
-from this file into the Jinja2 templating engine.  
-This file controls:
 
-* Company-specific variables (names, emails, etc.)  
-* PDF metadata (titles, authors)  
-* Feature toggles (e.g., show_internal_notes)  
-* Service type toggles (e.g., PaaS, SaaS)  
-* Compliance framework toggles (e.g., hipaa, soc2)  
-* Revision history toggles
+The core of this engine is the `conf/config.yaml` file, which acts as a master
+control panel for all your policies.
 
-For a detailed guide on how to use these variables with Jinja2, please see the  
-Templating Guide.
+* **Company Variables:** Basic text replacement for names, emails, etc.
 
-## **License**
+* **PDF Metadata:** Sets the title and author for the combined PDF.
+
+* **Feature Toggles:** Booleans (`true`/`false`) to show/hide entire sections (e.g., `show_internal_notes`).
+
+* **Service Types:** Nested objects to control content based on your offerings (e.g., `service_types.paas.enabled`).
+
+* **Compliance Frameworks:** Nested objects to show/hide policy sections based on framework (e.g., `compliance_frameworks.hipaa`).
+
+* **Revision History Toggles:** Controls whether the Git history is appended to the final documents.
+
+### Advanced Documentation
+
+* **Templating:** For a detailed guide on using Jinja2 logic (`if`, `for`, etc.), see [docs/templating_guide.md](https://www.google.com/search?q=docs/templating_guide.md).
+
+* **Config Validation:** This project includes a script to help you check your config for errors. See [docs/CONFIG_VALIDATION.md](https://www.google.com/search?q=docs/CONFIG_VALIDATION.md) for details.
+
+## License
+
 This project uses a hybrid licensing model:
 
-* **The Software** (all .py, .yml, .github/workflows files) is licensed under the MIT License.  
-* **The Content** (the .md policy files) is licensed under the CC BY-SA 4.0 License, as it is a derivative of the original Catalyze policies.
+* **The Software** (all `.py`, `.yml`, `.github/workflows` files) is licensed under the MIT License.
 
-See the [LICENSE.md](LICENSE.md) file for full details.
+* **The Content** (the `.md` policy files) is licensed under the CC BY-SA 4.0 License, as it is a derivative of the original Catalyze policies.
+
+See the [LICENSE.md](license.md) file for full details.
