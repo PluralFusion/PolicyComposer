@@ -29,8 +29,14 @@ jobs:
       - name: Install Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y pandoc texlive-latex-base texlive-fonts-recommended texlive-latex-extra
+          sudo apt-get install -y pandoc texlive-latex-base texlive-fonts-recommended texlive-latex-extra fontconfig
           pip install PyYAML Jinja2
+
+      - name: Generate Font List
+        run: |
+          echo "--- Generating list of available system fonts ---"
+          fc-list | cut -d: -f2 | sort | uniq > font_list.txt
+          echo "font_list.txt created."
 
       - name: Generate Git History
         # Pass the current commit info as environment variables
@@ -54,3 +60,10 @@ jobs:
         with:
           name: policy-pdfs
           path: pdf/
+
+      - name: Upload Font List Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: available-fonts
+          path: font_list.txt
+

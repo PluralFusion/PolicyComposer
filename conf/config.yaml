@@ -37,6 +37,20 @@ md_show_revision_history: true
 pdf_show_revision_history: true
 combined_pdf_show_revision_history: false
 
+# ----------------------------------
+# PDF Font Configuration
+# ----------------------------------
+# 'mainfont' is used by Pandoc to set the font.
+# Fonts that should be available on the GitHub runner:
+# - Noto Sans 
+# - Noto Serif (A great, highly-readable serif alternative)
+# - DejaVu Sans
+# - DejaVu Serif
+# - FreeSans
+# - FreeSerif
+# 
+pdf_main_font: "Noto Sans"
+
 # Service Offerings and Infrastructure
 ## Service Types
 service_types:
