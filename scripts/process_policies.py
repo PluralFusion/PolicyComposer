@@ -22,8 +22,13 @@ os.makedirs(temp_combined_dir, exist_ok=True)
 
 # --- 2. Load Config & History ---
 print(f"Loading config from {config_path}")
-with open(config_path, 'r') as f:
-    config = yaml.safe_load(f)
+try:
+    with open(config_path, 'r') as f:
+        config = yaml.safe_load(f)
+except yaml.YAMLError as e:
+    print(f"ERROR: Failed to parse {config_path}. Please check for syntax errors.")
+    print(f"Parser error: {e}")
+    exit(1)
 
 # Load the policy order config
 print(f"Loading policy order from {order_file}")
@@ -191,4 +196,3 @@ except Exception as e:
     exit(1)
 
 print("Policy build process completed successfully.")
-
