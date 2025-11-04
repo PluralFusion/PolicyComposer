@@ -71,17 +71,14 @@
 ## Security Infrastructure
 
 ### Monitoring and Detection
-{% if security_vendors %}
+{% if vendors %}
 1. Security Tools and Services:
-{% for vendor in security_vendors %}
-   * {{ vendor }} for security monitoring and threat detection
+{% for vendor in vendors if 'Security' in vendor.services %}
+   * {{ vendor.name }} for security monitoring and threat detection
 {% endfor %}
-{% endif %}
-
-{% if monitoring_vendors %}
 2. System Monitoring:
-{% for vendor in monitoring_vendors %}
-   * {{ vendor }} for performance and availability monitoring
+{% for vendor in vendors if 'Monitoring' in vendor.services %}
+   * {{ vendor.name }} for performance and availability monitoring
 {% endfor %}
 {% endif %}
 
@@ -307,17 +304,14 @@ The Security Incident Response Team (SIRT) is responsible for coordinating and m
 * Technical Response Team
 
 ### Vendor Coordination
-{% if security_vendors %}
+{% if vendors %}
 1. Security Tool Vendors:
-{% for vendor in security_vendors %}
-   * {{ vendor }} - Security monitoring and response
+{% for vendor in vendors if 'Security' in vendor.services %}
+   * {{ vendor.name }} - Security monitoring and response
 {% endfor %}
-{% endif %}
-
-{% if platform_vendors %}
 2. Infrastructure Providers:
-{% for vendor in platform_vendors %}
-   * {{ vendor }}{% if vendor in baa_vendors %} (with BAA){% endif %}
+{% for vendor in vendors if 'Platform' in vendor.services %}
+   * {{ vendor.name }}{% if vendor.baa_signed %} (with BAA){% endif %}
 {% endfor %}
 {% endif %}
 
@@ -328,5 +322,3 @@ The Security Incident Response Team (SIRT) is responsible for coordinating and m
 {% if audit_penetration_internal.performed %}
 * Internal Testing: {{ audit_penetration_internal.frequency }} by {{ audit_penetration_internal.auditor_name }}
 {% endif %}
-
-

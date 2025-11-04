@@ -10,19 +10,10 @@ This policy implements the requirements of HIPAA § 164.310(d)(1) - Device and M
 This policy supports SOC2 Common Criteria (CC) 6.7 and CC 8.1, addressing the identification, protection, and disposal of system components containing sensitive data.
 {% endif %}
 
-{% if data_storage_vendors %}
+{% if vendors %}
 All {{ company }} data is stored on media maintained by:
-{% for vendor in data_storage_vendors %}
-{%- if not loop.first -%}
-    {%- if loop.last %} and {% else %}, {% endif -%}
-{% endif -%}
-{{ vendor }}
-{%- endfor -%}.
-
-{% for vendor in data_storage_vendors %}
-{% if vendor in baa_vendors %}
-{{ vendor }} has signed a BAA with {{ company }} committing to the policy below.
-{% endif %}
+{% for vendor in vendors if 'Data Storage' in vendor.services %}
+* {{ vendor.name }}{% if vendor.baa_signed %} (with signed BAA){% endif %}
 {% endfor %}
 {% endif %}
 
@@ -31,18 +22,16 @@ All {{ company }} data is stored on media maintained by:
 {{ company }} implements a comprehensive approach to data storage and media management:
 
 1. Infrastructure
-{% if platform_vendors %}
+{% if vendors %}
    * Cloud infrastructure provided by:
-{% for vendor in platform_vendors %}
-     * {{ vendor }}{% if vendor in baa_vendors %} (with BAA){% endif %}
+{% for vendor in vendors if 'Platform' in vendor.services %}
+     * {{ vendor.name }}{% if vendor.baa_signed %} (with BAA){% endif %}
 {% endfor %}
-{% endif %}
 
 2. Data Storage
-{% if data_storage_vendors %}
    * Data storage services provided by:
-{% for vendor in data_storage_vendors %}
-     * {{ vendor }}{% if vendor in baa_vendors %} (with BAA){% endif %}
+{% for vendor in vendors if 'Data Storage' in vendor.services %}
+     * {{ vendor.name }}{% if vendor.baa_signed %} (with BAA){% endif %}
 {% endfor %}
 {% endif %}
 

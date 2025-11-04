@@ -11,22 +11,6 @@ This policy implements the requirements of HIPAA § 164.310(a)(2)(iii) - Access 
 This policy supports SOC2 Common Criteria (CC) 7.1 and CC 8.1, addressing system configuration standardization, change management, and security baseline requirements.
 {% endif %}
 
-{% if platform_vendors %}
-{{ company }} utilizes infrastructure and configuration management services from:
-{% for vendor in platform_vendors %}
-{%- if not loop.first -%}
-    {%- if loop.last %} and {% else %}, {% endif -%}
-{% endif -%}
-{{ vendor }}
-{%- endfor -%}.
-
-{% for vendor in platform_vendors %}
-{% if vendor in baa_vendors %}
-{{ vendor }} has signed a BAA with {{ company }} committing to the policy below.
-{% endif %}
-{% endfor %}
-{% endif %}
-
 {{ company }} standardizes and automates configuration management through comprehensive documentation and automated tools for all changes to production systems and networks. Our configuration management processes are designed to ensure system security, integrity, and compliance with all applicable standards.
 
 ## Applicable Standards
@@ -72,18 +56,18 @@ This policy supports SOC2 Common Criteria (CC) 7.1 and CC 8.1, addressing system
 
 6. **Infrastructure Management**
    * Cloud infrastructure is provided by:
-{% for vendor in platform_vendors %}
-     * {{ vendor }}{% if vendor in baa_vendors %} (BAA in place){% endif %}
+{% for vendor in vendors if 'Platform' in vendor.services %}
+     * {{ vendor.name }}{% if vendor.baa_signed %} (BAA in place){% endif %}
 {% endfor %}
    * Data storage is managed by:
-{% for vendor in data_storage_vendors %}
-     * {{ vendor }}{% if vendor in baa_vendors %} (BAA in place){% endif %}
+{% for vendor in vendors if 'Data Storage' in vendor.services %}
+     * {{ vendor.name }}{% if vendor.baa_signed %} (BAA in place){% endif %}
 {% endfor %}
 
 7. **Monitoring and Alerting**
    * System monitoring is provided by:
-{% for vendor in monitoring_vendors %}
-     * {{ vendor }}
+{% for vendor in vendors if 'Monitoring' in vendor.services %}
+     * {{ vendor.name }}
 {% endfor %}
 
 8. **Operating System Standards**
@@ -92,6 +76,10 @@ This policy supports SOC2 Common Criteria (CC) 7.1 and CC 8.1, addressing system
 {% for version in versions %}
      * {{ version.name }}
 {% endfor %}
+{% endfor %}
+   * Security tools are implemented across all systems:
+{% for vendor in vendors if 'Security' in vendor.services %}
+     * {{ vendor.name }} for security monitoring and threat detection
 {% endfor %}
 
 9. **Deployment Schedule**

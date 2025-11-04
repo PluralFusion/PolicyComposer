@@ -1,215 +1,136 @@
-# Organization Information
-# Core company details and contact information
-company_name: "ACME LTD"
-company: "ACME"  # Short name used throughout policies
-company_website: "https://example.com"
-company_service: "widgets, thingamabobs, and doodads"
-company_service_user_types: "coyotes, hunters, and other cartoon characters"
-
-# Key Personnel
-security_officer_name: "Wile E. Coyote"
-security_office_email: "security@example.com"
-privacy_officer_name: "Elmer Fudd"
-privacy_officer_email: "privacy@example.com"
-
-# Policy Management
-policy_website: "https://example.com/policy"
-hipaa_website: "https://example.com/hipaa"
-change_request_form_link: "https://docs.google.com/a/example.com/forms/d/randomstuff/viewform"
-
-# Document Generation Settings
-## PDF Metadata
-combined_pdf_title: "ACME Compliance Policy Manual"
-combined_pdf_author: "ACME LTD"
-
-## Review Committee
+company_name: ACME LTD
+company: ACME
+company_website: https://example.com
+company_service: widgets, thingamabobs, and doodads
+company_service_user_types: coyotes, hunters, and other cartoon characters
+security_officer_name: Wile E. Coyote
+security_office_email: security@example.com
+privacy_officer_name: Elmer Fudd
+privacy_officer_email: privacy@example.com
+policy_website: https://example.com/policy
+hipaa_website: https://example.com/hipaa
+change_request_form_link: https://docs.google.com/a/example.com/forms/d/randomstuff/viewform
+combined_pdf_title: ACME Compliance Policy Manual
+combined_pdf_author: ACME LTD
 show_review_committee: true
 review_committee:
-  - "Wile E. Coyote"
-  - "Elmer Fudd"
-
-# --- Advanced Version History Control ---
-#
-# This system supports two types of versioning:
-# 1. Global Releases (Recommended):
-#    To stamp ALL documents with a new version, simply update the
-#    'release_version' variable below. The action will detect this change
-#    and create a new, official GitHub Release with your PDFs.
-# 2. Hotfixes (For single files):
-#    To add a version to just *one* file, commit your change to that file
-#    using the 'release_commit_prefix' (e.g., "RELEASE: Fixed typo").
-#
-# This value is the *current* official version of the policy set.
-# Updating this (e.g., from "v1.0.0" to "v1.1.0") will trigger
-# a new global release for ALL documents.
-release_version: "v.0.0.2"
-
-# This prefix is for "hotfix" commits that only apply to a *single* file.
-# It is ignored during a global 'release_version' change.
-release_commit_prefix: "RELEASE:"
-
-## Version History Settings
-# Controls whether git log history appears in generated documents
+- Wile E. Coyote
+- Elmer Fudd
+release_version: v.0.0.2
+release_commit_prefix: 'RELEASE:'
 md_show_revision_history: true
 pdf_show_revision_history: true
 combined_pdf_show_revision_history: false
-
-# On a global release, should the new version REPLACE all previous history,
-# or be APPENDED to it?
-# - "append" (default): Adds the new global release to the top of existing hotfixes.
-# - "replace": Wipes all previous history and shows only the new global release.
-global_release_history_style: "append"
-
-
-## Content Controls
+global_release_history_style: append
 show_internal_notes: true
-
-# ----------------------------------
-# PDF Font Configuration
-# ----------------------------------
-# Fonts must be installed on the GitHub runner (or your local machine).
-# Run the 'List Available Fonts' workflow to see all options.
-pdf_main_font: "DejaVu Sans"        # Main body text
-pdf_header_font: "Lato Semibold"      # Headers and titles (defaults to main font)
-pdf_code_font: "DejaVu Sans Mono"   # Font for code blocks
-
-# Service Offerings and Infrastructure
-## Service Types
+pdf_main_font: DejaVu Sans
+pdf_header_font: Lato Semibold
+pdf_code_font: DejaVu Sans Mono
 service_types:
   saas:
     enabled: true
-    phi_access: true          # Indicates if SaaS handles PHI/ePHI
-    data_isolation: true      # Multi-tenant data isolation
-    api_security: true        # API security controls
-  
+    phi_access: true
+    data_isolation: true
+    api_security: true
   paas:
     enabled: true
-    container_isolation: true  # Container-based isolation
-    phi_access: true          # PaaS handles PHI/ePHI
-    customer_deployment: true  # Customer deployment capabilities
-  
+    container_isolation: true
+    phi_access: true
+    customer_deployment: true
   medical_device:
     enabled: true
-    fda_registered: true      # FDA registration status
-    phi_access: true          # Device handles PHI/ePHI
-    patient_safety: true      # Patient safety controls
-  
+    fda_registered: true
+    phi_access: true
+    patient_safety: true
   mobile_app:
     enabled: true
-    encryption: true          # Mobile data encryption
-    phi_access: true          # App handles PHI/ePHI
-    offline_mode: true        # Offline functionality
-  
+    encryption: true
+    phi_access: true
+    offline_mode: true
   iaas:
     enabled: false
-    description: "Infrastructure as a Service"
-  
+    description: Infrastructure as a Service
   baas:
     enabled: false
-    description: "Backend as a Service"
-  
+    description: Backend as a Service
   managed_service:
     enabled: false
-    description: "Managed Service Provider"
-  
+    description: Managed Service Provider
   hosting_service:
     enabled: false
-    description: "Hosting Service Provider"
-  
+    description: Hosting Service Provider
   consulting_service:
     enabled: false
-    description: "Consulting Services"
-  
+    description: Consulting Services
   other_service:
     enabled: false
     services:
-      - name: "IoT Platform"
-        description: "A platform for managing IoT devices and data"
-      - name: "AI/ML Service"
-        description: "A service offering AI and machine learning capabilities"
-ephi_access: true  # Canonical flag indicating whether ACME handles PHI/ePHI
-
-# Vendor Management and Infrastructure
-## Policy Controls
+    - name: IoT Platform
+      description: A platform for managing IoT devices and data
+    - name: AI/ML Service
+      description: A service offering AI and machine learning capabilities
+ephi_access: true
 vendor_management_policy: true
 vendor_risk_assessment: true
 vendor_security_requirements: true
 vendor_monitoring_auditing: true
 vendor_termination_procedures: true
-
-## Service Providers
-data_storage_vendors:
-  - "AWS"
-  - "Google Cloud"
-  - "Microsoft Azure"
-hosting_vendors:
-  - "AWS"
-platform_vendors:
-  - "AWS"
-monitoring_vendors:
-  - "Datadog"
-  - "PagerDuty"
-security_vendors:
-  - "CrowdStrike"
-  - "Splunk"
-data_backup_vendors:
-  - "Veeam"
-  - "Druva"
-disaster_recovery_vendors:
-  - "Zerto"
-  - "Carbonite"
-
-## Compliance Agreements
-baa_vendors:  # Business Associate Agreements
-  - "AWS"
-  - "Google Cloud"
-  - "Microsoft Azure"
-
-## Security Tools
+vendors:
+- name: AWS
+  services:
+  - Data Storage
+  - Hosting
+  - Platform
+  - Monitoring
+  baa_signed: true
+  _id: 642deba6-d5cb-43c5-9f74-0f4b11fa794f
+- name: Google Cloud
+  services:
+  - Data Storage
+  - Platform
+  - Hosting
+  baa_signed: true
+  _id: 6a357b05-6fd4-455d-8b67-e5087baf3c6d
+- name: Datadog
+  services:
+  - Monitoring
+  baa_signed: false
+  _id: 2f57608c-97e3-405f-96cd-6b1e5b8ee87d
 vulnerability_scanner:
-  name: "Nessus Scanner"
-  provider: "Tenable"
-  functions: "consistently scan, identify, and address vulnerabilities"
-
-# Compliance and Audit Management
-## Active Frameworks
+  name: Nessus Scanner
+  provider: Tenable
+  functions: consistently scan, identify, and address vulnerabilities
 compliance_frameworks:
-  hipaa: true      # Health Insurance Portability and Accountability Act
-  hitrust: true    # HITRUST CSF
-  soc2: true       # SOC 2 Type II
-  iso27001: false  # ISO/IEC 27001
-  pci_dss: false   # Payment Card Industry Data Security Standard
-  gdpr: false      # General Data Protection Regulation
-  ccpa: false      # California Consumer Privacy Act
+  hipaa: true
+  hitrust: true
+  soc2: true
+  iso27001: false
+  pci_dss: false
+  gdpr: false
+  ccpa: false
   other: false
-  other_description: ""
-
-## Audit Status
+  other_description: ''
 hipaa_audit:
   in_progress: false
   completed: true
-  completed_date: "YYYY-MM-DD"
-
+  completed_date: YYYY-MM-DD
 hitrust_audit:
   in_progress: false
   completed: false
-  certification_date: ""
-
-## Security Testing
+  certification_date: ''
+soc2_audit:
+  in_progress: false
+  completed: false
 audit_penetration_external:
   performed: true
-  frequency: "bi-annual"
-  auditor_name: "a third-party security firm"
+  frequency: bi-annual
+  auditor_name: a third-party security firm
   findings_addressed: true
-
 audit_penetration_internal:
   performed: true
-  frequency: "with each major release"
-  auditor_name: "PluralFusion" 
+  frequency: with each major release
+  auditor_name: PluralFusion
   findings_addressed: true
-
-# Workplace Environment Configuration
-## Remote Work Policy
 remote_work:
   enabled: true
   models:
@@ -217,95 +138,117 @@ remote_work:
     full_time: true
     international: true
     temporary: true
-  
   security:
     vpn_required: true
     mfa_required: true
     monitoring_enabled: true
     time_tracking_required: true
-  
   equipment:
     company_provided: true
     stipend_available: true
     ergonomic_requirements: true
     internet_requirements: true
-
-## BYOD (Bring Your Own Device)
 byod:
   policy_enabled: true
   allowed_devices:
     phones: true
     computers: true
     other_devices: true
-  
   security_requirements:
     mdm_required: true
     encryption_required: true
     password_policy_enforced: true
     screen_lock_required: true
-  
   management:
     app_restrictions: true
     data_backup_required: true
     remote_wipe_enabled: true
     security_scanning: true
-
-
-# Approved Technology Stack
-## Software Tools
 approved_tools:
   collaboration:
-    - name: "Google Workspace"
-      type: "Productivity Suite"
-      approved_for: ["Email", "Document Creation", "Spreadsheets", "Presentations"]
-    - name: "Google Meet"
-      type: "Video Conferencing"
-      approved_for: ["Remote Work", "Internal Meetings"]
-    - name: "Slack"
-      type: "Messaging"
-      approved_for: ["Internal Communication"]
-    - name: "Mattermost"  
-      type: "Messaging"
-      approved_for: ["Internal Communication"]
-  
+  - name: Google Workspace
+    type: Productivity Suite
+    approved_for:
+    - Email
+    - Document Creation
+    - Spreadsheets
+    - Presentations
+    _id: 5072ea76-c4d5-402d-8daf-43d28ab8e0b9
+  - name: Google Meet
+    type: Video Conferencing
+    approved_for:
+    - Remote Work
+    - Internal Meetings
+    _id: 192a409c-d7aa-453f-b7de-42d1a540dc01
+  - name: Slack
+    type: Messaging
+    approved_for:
+    - Internal Communication
+    _id: 612a96ae-3a99-4e63-a6e1-497c62644374
+  - name: Mattermost
+    type: Messaging
+    approved_for:
+    - Internal Communication
+    _id: 695e8a7f-fba2-4a9d-b7a6-1bd3a07a7fb5
+  - _id: ad601220-4a69-4030-aab4-49280450206b
+    approved_for:
+    - Internal and External Communication
+    name: Zulip
+    type: Messaging
   development:
-    - name: "Github"
-      type: "Source Code Management"
-      approved_for: ["Code Repository", "Version Control"]
-    - name: "Github Projects"
-      type: "Project Management"
-      approved_for: ["Task Tracking", "Project Planning"]
-    - name: "VS Code"
-      type: "IDE"
-      approved_for: ["Code Development"]
-    - name: "JetBrains Toolbox" 
-      type: "IDE"
-      approved_for: ["Code Development"]
-    - name: "Codex"
-      type: "IDE"
-      approved_for: ["Code Development"]
-  
+  - name: Github
+    type: Source Code Management
+    approved_for:
+    - Code Repository
+    - Version Control
+    _id: 3cebc35a-4395-4e53-8204-38ddd8070ee7
+  - name: Github Projects
+    type: Project Management
+    approved_for:
+    - Task Tracking
+    - Project Planning
+    _id: daa31383-f60b-4df4-a570-be7f28e1a8f5
+  - name: VS Code
+    type: IDE
+    approved_for:
+    - Code Development
+    _id: 5f550430-a014-4d8e-850b-3abe849b96a9
+  - name: JetBrains Toolbox
+    type: IDE
+    approved_for:
+    - Code Development
+    _id: a2e947c0-34a9-4de3-b640-3eb41c5c381b
+  - name: Codex
+    type: IDE
+    approved_for:
+    - Code Development
+    _id: bc836d59-4bc3-44a6-800c-37587223774d
   productivity:
-    - name: "OnlyOffice"
-      type: "Document Management"
-      approved_for: ["Document Creation", "Collaboration"]
-    - name: "LibreOffice"
-      type: "Productivity Suite"
-      approved_for: ["Document Creation", "Spreadsheets", "Presentations"]
-
-## Operating Systems
+  - name: OnlyOffice
+    type: Document Management
+    approved_for:
+    - Document Creation
+    - Collaboration
+    _id: a87997e3-f9ad-4773-bde0-dacb8c418d48
+  - name: LibreOffice
+    type: Productivity Suite
+    approved_for:
+    - Document Creation
+    - Spreadsheets
+    - Presentations
+    _id: 66aa46cd-0610-429f-b6bc-9059872c4f53
 approved_os:
   workstations:
     linux:
-      - name: "Ubuntu 24.04 LTS"
-      - name: "Ubuntu 22.04 LTS"
+    - name: Ubuntu 24.04 LTS
+    - name: Ubuntu 22.04 LTS
     macos:
-      - name: "macOS Sonoma"
-      - name: "macOS Ventura"
+    - name: macOS Sonoma
+    - name: macOS Ventura
     windows:
-      - name: "Windows 11 Pro"
-  
+    - name: Windows 11 Pro
   servers:
     linux:
-      - name: "Debian 12"
-      - name: "Ubuntu 24.04 LTS"
+    - name: Debian 12
+    - name: Ubuntu 24.04 LTS
+security_officer_email: ''

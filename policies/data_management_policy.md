@@ -12,10 +12,10 @@ This policy supports the SOC2 Trust Services Criteria for Availability, Confiden
 
 # {{ company }} Data Management Policy
 
-{% if data_storage_vendors %}
+{% if vendors %}
 All {{ company }} data backups are maintained by:
-{% for vendor in data_storage_vendors %}
-* {{ vendor }}{% if vendor in baa_vendors %} (with signed BAA){% endif %}
+{% for vendor in vendors if 'Data Storage' in vendor.services or 'Data Backup' in vendor.services %}
+* {{ vendor.name }}{% if vendor.baa_signed %} (with signed BAA){% endif %}
 {% endfor %}
 {% endif %}
 

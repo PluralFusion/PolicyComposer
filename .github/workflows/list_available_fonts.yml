@@ -12,18 +12,30 @@ jobs:
     steps:
       - name: Generate Font List
         run: |
-          echo "Querying system for all available fonts..."
-          # We fc-list, cut to get just the font family, sort, and get unique names
-          fc-list :family | cut -d, -f1 | sort | uniq > font_list.txt
+          echo "Querying system for all available fonts..."          
+          # This command lists all fonts, cuts the output to get just the name,
+          # trims leading whitespace, sorts, and gets unique names.
+          fc-list | cut -d: -f2 | sed 's/^[[:space:]]*//' | sort | uniq > font_list.txt
           echo "Font list text file generated."
 
       - name: Generate HTML Version
         run: |
           echo "Generating HTML version..."
-          echo "<html><head><title>Available Fonts</title><style>body { font-family: sans-serif; line-height: 1.6; padding: 2em; } ul { column-count: 3; list-style-type: none; } li { margin-bottom: 8px; font-size: 1.1em; }</style></head><body>" > font_list.html
-          echo "<h1>Available Fonts on Runner</h1><p>The font name will only render in its own typeface if you have it installed on your local machine.</p><ul>" >> font_list.html
-          # This loop now wraps each font name in a span with a style tag
-          while read line; do echo "<li><span style=\"font-family: '$line';\">$line</span></li>"; done < font_list.txt >> font_list.html
+          # Create a URL-encoded list of font families for Google Fonts
+          FONTS_URL=$(sed 's/ /+/g' font_list.txt | awk '{print "family="$0}' | paste -sd'&' -)
+          
+          # Start HTML file and add Google Fonts link
+          cat <<'EOF' > font_list.html
+          <html><head><title>Available Fonts</title>
+          <link rel="preconnect" href="https://fonts.googleapis.com">
+          <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+          <style>body { font-family: sans-serif; line-height: 1.6; padding: 2em; } ul { column-count: 3; list-style-type: none; padding-left: 0; } li { margin-bottom: 8px; font-size: 1.1em; }</style></head><body>
+          <h1>Available Fonts on Runner</h1><p>The font name will render in its own typeface if available from Google Fonts or installed locally.</p><ul>
+          EOF
+          echo "<link href=\"https://fonts.googleapis.com/css2?$FONTS_URL&display=swap\" rel=\"stylesheet\">" >> font_list.html
+          
+          # Loop through fonts and create list items with inline styles
+          while read line; do echo "<li><span style=\"font-family: '$line', sans-serif;\">$line</span></li>"; done < font_list.txt >> font_list.html
           echo "</ul></body></html>" >> font_list.html
           echo "Font list HTML file generated."
 
@@ -40,4 +52,3 @@ jobs:
           path: |
             font_list.txt
             font_list.html
-

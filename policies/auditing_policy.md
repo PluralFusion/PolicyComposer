@@ -11,19 +11,10 @@ This policy implements the requirements of HIPAA § 164.312(b) - Audit Controls 
 This policy supports SOC2 Common Criteria (CC) 4.1 and CC 7.2, addressing system monitoring, logging, and audit trail requirements for security events and user activities.
 {% endif %}
 
-{% if data_storage_vendors %}
+{% if vendors %}
 All {{ company }} logging and auditing infrastructure is maintained by:
-{% for vendor in data_storage_vendors %}
-{%- if not loop.first -%}
-    {%- if loop.last %} and {% else %}, {% endif -%}
-{% endif -%}
-{{ vendor }}
-{%- endfor -%}.
-
-{% for vendor in data_storage_vendors %}
-{% if vendor in baa_vendors %}
-{{ vendor }} has signed a BAA with {{ company }} committing to the policy below.
-{% endif %}
+{% for vendor in vendors if 'Data Storage' in vendor.services or 'Hosting' in vendor.services %}
+* **{{ vendor.name }}**: {% if vendor.baa_signed %}Has a BAA in place with {{ company }}.{% else %}Does not have a BAA in place.{% endif %}
 {% endfor %}
 {% endif %}
 

@@ -1,5 +1,256 @@
 import os
+import argparse
+import sys
+import os
+from pathlib import Path
 import yaml
+from jinja2 import Environment, meta
+
+CONFIG_DEFAULT_PATH = 'conf/config.yaml'
+SCHEMA_DEFAULT_PATH = 'conf/ui_schema.yaml'
+POLICY_DIR = 'policies'
+
+class ConfigValidator:
+    def __init__(self, config_path):
+        self.config_path = config_path
+        self.warnings = []
+        self.errors = []
+        try:
+            with open(config_path, 'r') as f:
+                self.config = yaml.safe_load(f)
+        except Exception as e:
+            self.errors.append(f"Fatal: Could not read or parse YAML file at {config_path}: {e}")
+            self.config = None
+        
+        try:
+            with open(SCHEMA_DEFAULT_PATH, 'r') as f:
+                self.schema = yaml.safe_load(f)
+        except Exception as e:
+            self.warnings.append(f"Could not read or parse UI Schema file at {SCHEMA_DEFAULT_PATH}. UI validation will be skipped.")
+            self.schema = None
+
+    def add_error(self, message):
+        self.errors.append(message)
+
+    def add_warning(self, message):
+        self.warnings.append(message)
+
+    def validate(self):
+        if not self.config:
+            return
+
+        print("--- Running All Validation Checks ---")
+        self.check_required_keys()
+        self.check_ephi_consistency()
+        self.check_vendor_structure()
+        self.check_review_committee()
+        self.check_jinja_variables()
+        if self.schema:
+            self.check_ui_schema()
+        print("--- Validation Complete ---")
+
+    def check_required_keys(self):
+        """Checks for presence and basic types of essential keys."""
+        print("1. Checking for required keys and types...")
+        required = {
+            'company_name': str, 'release_version': str, 'vendors': list,
+            'compliance_frameworks': dict, 'service_types': dict
+        }
+        for key, expected_type in required.items():
+            if key not in self.config:
+                self.add_error(f"Required key '{key}' is missing from config.")
+            elif not isinstance(self.config.get(key), expected_type):
+                self.add_error(f"Key '{key}' has wrong type. Expected {expected_type.__name__}, got {type(self.config.get(key)).__name__}.")
+
+    def check_ephi_consistency(self):
+        """The original check for ephi_access consistency."""
+        print("2. Checking ePHI flag consistency...")
+        canonical_ephi_access = self.config.get('ephi_access', False)
+        
+        derived_ephi_access = False
+        service_types = self.config.get('service_types', {})
+        if not isinstance(service_types, dict):
+            self.add_error("'service_types' should be a dictionary.")
+            return
+
+        for service, details in service_types.items():
+            if isinstance(details, dict) and details.get('enabled') and details.get('phi_access'):
+                derived_ephi_access = True
+                break
+        
+        if canonical_ephi_access != derived_ephi_access:
+            self.add_error(
+                f"Mismatch found: The main 'ephi_access' is '{canonical_ephi_access}', "
+                f"but based on 'service_types', it should be '{derived_ephi_access}'. "
+                "Use --fix to update the main flag."
+            )
+
+    def check_vendor_structure(self):
+        """Validates the structure of the 'vendors' list of objects."""
+        print("3. Checking vendor data structure...")
+        vendors = self.config.get('vendors', [])
+        if not isinstance(vendors, list):
+            self.add_error("'vendors' key must be a list.")
+            return
+
+        for i, vendor in enumerate(vendors):
+            if not isinstance(vendor, dict):
+                self.add_error(f"Vendor at index {i} is not a valid object.")
+                continue
+            if 'name' not in vendor:
+                self.add_error(f"Vendor at index {i} is missing required 'name' key.")
+            if 'services' not in vendor:
+                self.add_error(f"Vendor '{vendor.get('name', 'N/A')}' is missing 'services' key.")
+            elif not isinstance(vendor.get('services'), list):
+                self.add_error(f"Vendor '{vendor.get('name', 'N/A')}': 'services' must be a list of strings.")
+            if 'baa_signed' not in vendor:
+                self.add_warning(f"Vendor '{vendor.get('name', 'N/A')}' is missing 'baa_signed' key.")
+            elif not isinstance(vendor.get('baa_signed'), bool):
+                self.add_error(f"Vendor '{vendor.get('name', 'N/A')}': 'baa_signed' must be a boolean (true/false).")
+
+    def check_review_committee(self):
+        """Checks for logical consistency with the review committee."""
+        print("4. Checking review committee logic...")
+        if self.config.get('show_review_committee') and not self.config.get('review_committee'):
+            self.add_warning("'show_review_committee' is true, but the 'review_committee' list is empty.")
+
+    def check_jinja_variables(self):
+        """Parses all policy templates and checks if used variables exist in the config."""
+        print("5. Checking for undefined Jinja2 variables in policy templates...")
+        env = Environment()
+        policy_files = list(Path(POLICY_DIR).rglob('*.md'))
+        all_template_vars = set()
+
+        for policy_file in policy_files:
+            try:
+                template_source = policy_file.read_text()
+                ast = env.parse(template_source)
+                template_vars = meta.find_undeclared_variables(ast)
+                all_template_vars.update(template_vars)
+            except Exception as e:
+                self.add_warning(f"Could not parse template {policy_file}: {e}")
+
+        # Flatten the config dict for easy checking of nested keys
+        config_keys = self._flatten_dict(self.config)
+
+        for var in sorted(list(all_template_vars)):
+            if var not in config_keys:
+                self.add_error(f"Template variable '{var}' is used in policies but not defined in config.yaml.")
+
+    def check_ui_schema(self):
+        """Validates the ui_schema.yaml against the config.yaml."""
+        print("6. Checking UI Schema against config...")
+        config_keys = self._flatten_dict(self.config)
+        schema_keys = self._flatten_schema(self.schema)
+
+        # Check that every key in the schema exists in the config
+        for key in schema_keys:
+            if key not in config_keys:
+                self.add_error(f"UI Schema key '{key}' does not exist in config.yaml.")
+
+        # Check that every key in the config exists in the schema (as a warning)
+        # We exclude some keys that are not meant to be in the UI
+        excluded_from_ui_check = ['release_commit_prefix', 'global_release_history_style']
+        for key in config_keys:
+            if key not in schema_keys and key not in excluded_from_ui_check:
+                self.add_warning(f"Config key '{key}' is not defined in the UI Schema. It will not appear in the web UI.")
+
+    def _flatten_schema(self, schema_node, parent_key='', sep='.'):
+        """Flattens the ui_schema.yaml to get a list of keys that map to config.yaml."""
+        keys = set()
+        for key, value in schema_node.items():
+            if key.startswith('_'):
+                continue
+            # If the value is a dictionary and has a 'widget' or '_widget' key, it's a configurable item.
+            if isinstance(value, dict) and ('widget' in value or '_widget' in value):
+                keys.add(key)
+            elif isinstance(value, dict):
+                keys.update(self._flatten_schema(value, parent_key=key)) # Recurse into nested structures
+        return keys
+
+    def _flatten_dict(self, d, parent_key='', sep='.'):
+        """Flattens a nested dictionary for easy key lookup."""
+        items = []
+        for k, v in d.items():
+            new_key = parent_key + sep + k if parent_key else k
+            if isinstance(v, dict):
+                items.extend(self._flatten_dict(v, new_key, sep=sep).items())
+            else:
+                items.append((new_key, v))
+        # Also add the top-level keys themselves for checks like {% if service_types.saas %}
+        for k in d.keys():
+            if isinstance(d[k], dict):
+                items.append((k, d[k]))
+        return dict(items)
+
+    def fix_ephi_access(self):
+        """Automatically updates the canonical ephi_access flag."""
+        if not self.config:
+            return False
+        
+        derived_ephi_access = False
+        service_types = self.config.get('service_types', {})
+        for service, details in service_types.items():
+            if isinstance(details, dict) and details.get('enabled') and details.get('phi_access'):
+                derived_ephi_access = True
+                break
+        
+        if self.config.get('ephi_access') != derived_ephi_access:
+            print(f"Fixing 'ephi_access' flag to '{derived_ephi_access}'...")
+            # We need to re-read and write using a YAML library that preserves comments and structure
+            # For simplicity here, we'll do a text-based replacement which is less robust but works for this case.
+            with open(self.config_path, 'r') as f:
+                lines = f.readlines()
+            
+            with open(self.config_path, 'w') as f:
+                for line in lines:
+                    if line.strip().startswith('ephi_access:'):
+                        f.write(f"ephi_access: {str(derived_ephi_access).lower()}\n")
+                    else:
+                        f.write(line)
+            print("File fixed.")
+            return True
+        else:
+            print("'ephi_access' flag is already consistent. No fix needed.")
+            return False
+
+def main():
+    parser = argparse.ArgumentParser(description="Validate the PolicyComposer config.yaml file.")
+    parser.add_argument('--config', default=CONFIG_DEFAULT_PATH, help=f"Path to the config file (default: {CONFIG_DEFAULT_PATH})")
+    parser.add_argument('--fix', action='store_true', help="Automatically fix the canonical 'ephi_access' flag if a mismatch is found.")
+    args = parser.parse_args()
+
+    if not os.path.exists(args.config):
+        print(f"Error: Config file not found at '{args.config}'", file=sys.stderr)
+        sys.exit(2)
+
+    validator = ConfigValidator(args.config)
+
+    if args.fix:
+        validator.fix_ephi_access()
+        # Re-run validation after fixing
+        print("\nRe-running validation after applying fix...")
+        validator = ConfigValidator(args.config)
+
+    validator.validate()
+
+    if validator.warnings:
+        print("\n--- ⚠️ Warnings ---")
+        for warning in validator.warnings:
+            print(f"- {warning}")
+
+    if validator.errors:
+        print("\n--- ❌ Errors ---")
+        for error in validator.errors:
+            print(f"- {error}")
+        print("\nValidation failed with errors.")
+        sys.exit(1)
+    
+    print("\n✅ Validation successful. No errors found.")
+    sys.exit(0)
+
+if __name__ == "__main__":
+    main()
 from jinja2 import Environment, FileSystemLoader, Template
 import subprocess
 import json
@@ -219,4 +470,3 @@ except Exception as e:
     exit(1)
 
 print("Policy build process completed successfully.")
-

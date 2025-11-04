@@ -1,24 +1,9 @@
 # IDS Policy
 
-{% if data_storage_vendors %}
+{% if vendors %}
 All {{ company }} data storage and exchanges occur on platforms maintained by 
-{% for vendor in data_storage_vendors %}
-{%- if not loop.first -%}
-    {%- if loop.last %} and {% else %}, {% endif -%}
-{% endif -%}
-{{ vendor }}
-{%- endfor -%}
-, 
-{% if data_storage_vendors|length == 1 %}
-a service provider that stores
-{% else %}
-service providers that store
-{% endif %}
-all of {{ company }}'s ePHI.
-
-{% for vendor in data_storage_vendors %}
-{% if vendor in baa_vendors %}
-{{ vendor }} has signed a BAA with {{ company }} committing to the policy below.
+{% for vendor in vendors if 'Data Storage' in vendor.services %}
+* {{ vendor.name }}{% if vendor.baa_signed %} (with signed BAA){% endif %}
 {% endif %}
 {% endfor %}
 {% endif %}
@@ -40,16 +25,14 @@ In order to preserve the integrity of data that {{ company }} stores, processes,
 ## Security Monitoring Infrastructure
 
 1. Primary Security Tools:
-{% if security_vendors %}
-{% for vendor in security_vendors %}
-   * {{ vendor }} for advanced threat detection and response
+{% if vendors %}
+{% for vendor in vendors if 'Security' in vendor.services %}
+   * {{ vendor.name }} for advanced threat detection and response
 {% endfor %}
-{% endif %}
 
 2. System Monitoring:
-{% if monitoring_vendors %}
-{% for vendor in monitoring_vendors %}
-   * {{ vendor }} for performance and availability monitoring
+{% for vendor in vendors if 'Monitoring' in vendor.services %}
+   * {{ vendor.name }} for performance and availability monitoring
 {% endfor %}
 {% endif %}
 

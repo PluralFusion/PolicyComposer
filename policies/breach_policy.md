@@ -34,15 +34,8 @@ This policy supports:
 * Customer notification processes
 * Regulatory reporting requirements
 
-{% if data_storage_vendors %}
-### Vendor Responsibilities
-{% for vendor in data_storage_vendors %}
-{% if vendor in baa_vendors %}
-* {{ vendor }} has signed a Business Associate Agreement (BAA) and must comply with all breach notification requirements.
-{% endif %}
-{% endfor %}
-{% endif %}
-
+{% if ndor Responsibilities
+{% for vendor is ie
 ## Applicable Standards from the HITRUST Common Security Framework
 
 * 11.a Reporting Information Security Events

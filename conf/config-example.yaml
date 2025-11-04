@@ -137,33 +137,21 @@ vendor_security_requirements: true
 vendor_monitoring_auditing: true
 vendor_termination_procedures: true
 
-## Service Providers
-data_storage_vendors:
-  - "AWS"
-  - "Google Cloud"
-  - "Microsoft Azure"
-hosting_vendors:
-  - "AWS"
-platform_vendors:
-  - "AWS"
-monitoring_vendors:
-  - "Datadog"
-  - "PagerDuty"
-security_vendors:
-  - "CrowdStrike"
-  - "Splunk"
-data_backup_vendors:
-  - "Veeam"
-  - "Druva"
-disaster_recovery_vendors:
-  - "Zerto"
-  - "Carbonite"
-
-## Compliance Agreements
-baa_vendors:  # Business Associate Agreements
-  - "AWS"
-  - "Google Cloud"
-  - "Microsoft Azure"
+## Vendors
+vendors:
+  - name: "AWS"
+    services: 
+      - "Data Storage"
+      - "Hosting"
+      - "Platform"
+    baa_signed: true
+  - name: "Google Cloud"
+    services: 
+      - "Data Storage"
+    baa_signed: true
+  - name: "Fly.io"
+    services: ["Hosting", "Platform"]
+    baa_signed: true
 
 ## Security Tools
 vulnerability_scanner:
@@ -194,6 +182,10 @@ hitrust_audit:
   in_progress: false
   completed: false
   certification_date: ""
+
+soc2_audit:
+  in_progress: false
+  completed: false
 
 ## Security Testing
 audit_penetration_external:

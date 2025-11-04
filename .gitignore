@@ -9,3 +9,6 @@ __pycache__/
 
 # Local Configuration
 config/config-company.yaml
+
+# Python virtual environment
+.venv/

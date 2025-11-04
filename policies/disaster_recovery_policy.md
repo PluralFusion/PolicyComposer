@@ -105,33 +105,27 @@ Example of the types of disasters that would initiate this plan are natural disa
 ## Infrastructure and System Recovery
 
 ### Cloud Infrastructure
-{% if platform_vendors %}
+{% if vendors %}
 Primary infrastructure provided by:
-{% for vendor in platform_vendors %}
-* {{ vendor }}{% if vendor in baa_vendors %} (with signed BAA){% endif %}
+{% for vendor in vendors if 'Platform' in vendor.services %}
+* {{ vendor.name }}{% if vendor.baa_signed %} (with signed BAA){% endif %}
 {% endfor %}
-{% endif %}
 
 ### Data Storage and Backup
-{% if data_storage_vendors %}
 Data storage and recovery managed by:
-{% for vendor in data_storage_vendors %}
-* {{ vendor }}{% if vendor in baa_vendors %} (with signed BAA){% endif %}
+{% for vendor in vendors if 'Data Storage' in vendor.services or 'Data Backup' in vendor.services %}
+* {{ vendor.name }}{% if vendor.baa_signed %} (with signed BAA){% endif %}
 {% endfor %}
-{% endif %}
 
 ### Monitoring and Security
-{% if monitoring_vendors %}
 System monitoring provided by:
-{% for vendor in monitoring_vendors %}
-* {{ vendor }}
+{% for vendor in vendors if 'Monitoring' in vendor.services %}
+* {{ vendor.name }}
 {% endfor %}
-{% endif %}
 
-{% if security_vendors %}
 Security monitoring and response by:
-{% for vendor in security_vendors %}
-* {{ vendor }}
+{% for vendor in vendors if 'Security' in vendor.services %}
+* {{ vendor.name }}
 {% endfor %}
 {% endif %}
 
@@ -346,9 +340,9 @@ The following teams have been developed and trained to respond to a contingency 
    * Monitor system performance
 
 {% if data_storage_vendors %}
-4. Vendor Coordination
-{% for vendor in data_storage_vendors %}
-   * Coordinate with {{ vendor }} for:
+4. Vendor Coordination {# This check is kept for backward compatibility but logic is updated #}
+{% for vendor in vendors if 'Data Storage' in vendor.services %}
+   * Coordinate with {{ vendor.name }} for:
      * Service restoration
      * Data synchronization
      * Performance monitoring

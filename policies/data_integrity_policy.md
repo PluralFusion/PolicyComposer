@@ -10,13 +10,10 @@ This policy implements the requirements of HIPAA § 164.308(a)(8) - Evaluation, 
 This policy supports SOC2 Processing Integrity criteria (PI 1.1, PI 1.2, PI 1.3) and Common Criteria (CC 6.1), ensuring data processing integrity, accuracy, and completeness through system configuration and monitoring.
 {% endif %}
 
-{% if platform_vendors %}
-All {{ company }} data exchanges occur on {% if platform_vendors|length == 1 %}a platform maintained by {{ platform_vendors[0] }}{% else %}platforms maintained by {% for vendor in platform_vendors %}{% if not loop.first %}{% if loop.last %} and {% else %}, {% endif %}{% endif %}{{ vendor }}{% endfor %}{% endif %}.
-
-{% for vendor in platform_vendors %}
-{% if vendor in baa_vendors %}
-{{ vendor }} has signed a BAA with {{ company }} committing to the policy below.
-{% endif %}
+{% if vendors %}
+All {{ company }} data exchanges occur on platforms maintained by our infrastructure vendors.
+{% for vendor in vendors if 'Platform' in vendor.services and vendor.baa_signed %}
+{{ vendor.name }} has signed a BAA with {{ company }} committing to the policy below.
 {% endfor %}
 {% endif %}
 
@@ -48,7 +45,9 @@ All {{ company }} data exchanges occur on {% if platform_vendors|length == 1 %}a
 ## Access Monitoring and Control
 
 * All access to Production Systems must be logged. This is done following the {{ company }} Auditing Policy.
-
+{% for vendor in vendors if 'Security' in vendor.services %}
+* All Production Systems must have {{ vendor.name }} deployed for continuous threat detection and prevention
+{% endfor %}
 ### Malware Prevention
 
 * All Production Systems must have {{ security_vendors[0] }} deployed for continuous threat detection and prevention
