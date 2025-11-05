@@ -28,7 +28,7 @@ graph TD
     A[1. Edit `conf/config.yaml` and policy files] --> B{2. Push to GitHub};
     B --> C{3. GitHub Action is triggered};
     C --> D[4. Generates MD & PDF files];
-    D --> E[5. Download Artifacts (.zip files)];
+    D --> E[5. Download Artifacts files];
 ```
 
 
