@@ -109,5 +109,5 @@ python3 "$BUILD_SCRIPT"
 
 echo "------------------------------------------------------------"
 echo "Build complete."
-echo "Your files are available in the 'md/' and 'pdf/' directories."
+echo "Your files are available in the 'output/' directory."
 echo "------------------------------------------------------------"

@@ -1,10 +1,9 @@
 # IDS Policy
 
 {% if vendors %}
-All {{ company }} data storage and exchanges occur on platforms maintained by 
+All {{ company }} data storage and exchanges occur on platforms maintained by:
 {% for vendor in vendors if 'Data Storage' in vendor.services %}
 * {{ vendor.name }}{% if vendor.baa_signed %} (with signed BAA){% endif %}
-{% endif %}
 {% endfor %}
 {% endif %}
 

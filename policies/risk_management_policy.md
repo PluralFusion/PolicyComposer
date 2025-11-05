@@ -2,12 +2,12 @@
 
 This policy establishes the scope, objectives, and procedures of {{ company }}'s information security risk management process. The risk management process is intended to support and protect the organization and its ability to fulfill its mission across all service platforms and delivery models.
 
-{% if hipaa %}
+{% if compliance_frameworks.hipaa.supported %}
 ## HIPAA Risk Management Requirements
 This policy specifically addresses the requirements set forth in the HIPAA Security Rule for risk analysis and management, ensuring compliance across all service delivery platforms.
 {% endif %}
 
-{% if service_types.saas %}
+{% if service_types.saas.enabled %}
 ## SaaS Platform Risk Considerations
 * Multi-tenant data isolation risks
 * Shared infrastructure vulnerabilities
@@ -15,7 +15,7 @@ This policy specifically addresses the requirements set forth in the HIPAA Secur
 * Data processing and storage compliance
 {% endif %}
 
-{% if service_types.paas %}
+{% if service_types.paas.enabled %}
 ## PaaS Environment Risk Considerations
 * Container security and isolation
 * Customer application deployment risks
@@ -23,7 +23,7 @@ This policy specifically addresses the requirements set forth in the HIPAA Secur
 * API security and access management
 {% endif %}
 
-{% if service_types.medical_device %}
+{% if service_types.medical_device.enabled %}
 ## Medical Device Risk Considerations
 * FDA compliance requirements
 * Patient safety implications
@@ -31,7 +31,7 @@ This policy specifically addresses the requirements set forth in the HIPAA Secur
 * Remote access and update risks
 {% endif %}
 
-{% if service_types.mobile_app %}
+{% if service_types.mobile_app.enabled %}
 ## Mobile Application Risk Considerations
 * Device diversity and security
 * Local data storage risks
@@ -51,7 +51,7 @@ This policy specifically addresses the requirements set forth in the HIPAA Secur
 * 164.308(a)(1)(ii)(B) – HIPAA Security Rule Risk Management 
 * 164.308(a)(8) – HIPAA Security Rule Evaluation
 
-{% if soc2 %}
+{% if compliance_frameworks.soc2.supported %}
 ## SOC2 Trust Services Criteria Requirements
 
 ### Common Criteria (CC)
@@ -89,10 +89,10 @@ This policy specifically addresses the requirements set forth in the HIPAA Secur
 
 **Risk Assessment**: The intent of completing a risk assessment is to determine potential threats and vulnerabilities and the likelihood and impact should they occur. The output of this process helps to identify appropriate controls for reducing or eliminating risk.
 
-{% if SaaS or PaaS or Medical_Device or Mobile_App %}
+{% if service_types.saas.enabled or service_types.paas.enabled or service_types.medical_device.enabled or service_types.mobile_app.enabled %}
 ### Platform-Specific Risk Assessment Requirements
 
-{% if SaaS %}
+{% if service_types.saas.enabled %}
 **SaaS Platform Assessment**
 * Evaluate multi-tenant isolation mechanisms
 * Assess data processing workflows
@@ -100,7 +100,7 @@ This policy specifically addresses the requirements set forth in the HIPAA Secur
 * Analyze backup and recovery procedures
 {% endif %}
 
-{% if PaaS %}
+{% if service_types.paas.enabled %}
 **PaaS Environment Assessment**
 * Evaluate container security
 * Assess customer isolation effectiveness
@@ -108,7 +108,7 @@ This policy specifically addresses the requirements set forth in the HIPAA Secur
 * Analyze infrastructure security
 {% endif %}
 
-{% if Medical_Device %}
+{% if service_types.medical_device.enabled %}
 **Medical Device Assessment**
 * Evaluate FDA compliance requirements
 * Assess device-specific security controls
@@ -116,7 +116,7 @@ This policy specifically addresses the requirements set forth in the HIPAA Secur
 * Analyze device-to-cloud communication
 {% endif %}
 
-{% if Mobile_App %}
+{% if service_types.mobile_app.enabled %}
 **Mobile Application Assessment**
 * Evaluate device security requirements
 * Assess data synchronization security
@@ -169,24 +169,24 @@ This policy specifically addresses the requirements set forth in the HIPAA Secur
 	* Track implementation of security measures
 {% endif %}
 
-{% if SaaS or PaaS or Medical_Device or Mobile_App %}
+{% if service_types.saas.enabled or service_types.paas.enabled or service_types.medical_device.enabled or service_types.mobile_app.enabled %}
 * Step 11. Platform-Specific Documentation
-{% if SaaS %}
+{% if service_types.saas.enabled %}
 	* Document multi-tenant security controls
 	* Map data flow and processing risks
 	* Detail service availability measures
 {% endif %}
-{% if PaaS %}
+{% if service_types.paas.enabled %}
 	* Document container security measures
 	* Detail customer isolation controls
 	* Map infrastructure security controls
 {% endif %}
-{% if Medical_Device %}
+{% if service_types.medical_device.enabled %}
 	* Document FDA compliance measures
 	* Detail device security controls
 	* Map patient safety risk controls
 {% endif %}
-{% if Mobile_App %}
+{% if service_types.mobile_app.enabled %}
 	* Document mobile security measures
 	* Detail offline data protection
 	* Map authentication controls
@@ -238,7 +238,7 @@ This policy specifically addresses the requirements set forth in the HIPAA Secur
 
 **Risk Management Schedule**: The two principle components of the risk management process - risk assessment and risk mitigation - will be carried out according to the following schedule to ensure the continued adequacy and continuous improvement of {{ company }}'s information security program:
 
-{% if hipaa %}
+{% if compliance_frameworks.hipaa.supported %}
 **HIPAA-Required Assessment Intervals**:
 * Annual comprehensive risk analysis
 * Periodic technical and non-technical evaluations
@@ -246,10 +246,10 @@ This policy specifically addresses the requirements set forth in the HIPAA Secur
 * Documentation review every 12 months
 {% endif %}
 
-{% if SaaS or PaaS or Medical_Device or Mobile_App %}
+{% if service_types.saas.enabled or service_types.paas.enabled or service_types.medical_device.enabled or service_types.mobile_app.enabled %}
 **Platform-Specific Assessment Schedules**:
 
-{% if SaaS %}
+{% if service_types.saas.enabled %}
 **SaaS Platform**:
 * Quarterly multi-tenant isolation testing
 * Monthly third-party integration review
@@ -257,7 +257,7 @@ This policy specifically addresses the requirements set forth in the HIPAA Secur
 * Daily monitoring of access patterns
 {% endif %}
 
-{% if PaaS %}
+{% if service_types.paas.enabled %}
 **PaaS Environment**:
 * Monthly container security assessment
 * Weekly infrastructure security review
@@ -265,7 +265,7 @@ This policy specifically addresses the requirements set forth in the HIPAA Secur
 * Continuous customer isolation monitoring
 {% endif %}
 
-{% if Medical_Device %}
+{% if service_types.medical_device.enabled %}
 **Medical Devices**:
 * Quarterly FDA compliance review
 * Monthly security patch assessment
@@ -273,7 +273,7 @@ This policy specifically addresses the requirements set forth in the HIPAA Secur
 * Continuous monitoring of device operations
 {% endif %}
 
-{% if Mobile_App %}
+{% if service_types.mobile_app.enabled %}
 **Mobile Applications**:
 * Monthly platform security review
 * Weekly API security assessment
@@ -289,4 +289,3 @@ This policy specifically addresses the requirements set forth in the HIPAA Secur
 ## Process Documentation
 
 Maintain documentation of all risk assessment, risk management, and risk mitigation efforts for a minimum of six years.
-

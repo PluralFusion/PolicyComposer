@@ -1,6 +1,5 @@
 # Generated build artifacts
-md/
-pdf/
+output/
 build/
 temp_combined/
 
@@ -8,7 +7,5 @@ temp_combined/
 __pycache__/
 
 # Local Configuration
-config/config-company.yaml
-
 # Python virtual environment
 .venv/

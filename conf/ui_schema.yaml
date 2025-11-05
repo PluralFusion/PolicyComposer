@@ -1,69 +1,19 @@
 # This file defines the structure and widgets for the Streamlit web UI.
 # It acts as a blueprint for rendering the config.yaml file.
 
-organization_info:
-  _widget: "container"
-  _label: "🏢 Organization & Policy Information"
-  company_name:
-    widget: "text_input"
-    label: "Company Full Name"
-  company:
-    widget: "text_input"
-    label: "Company Short Name"
-  company_website:
-    widget: "text_input"
-    label: "Company Website"
-  policy_website:
-    widget: "text_input"
-    label: "Policy Website URL"
-
-key_personnel:
-  _widget: "container"
-  _label: "🔑 Key Personnel"
-  security_officer_name:
-    widget: "text_input"
-    label: "Security Officer Name"
-  security_officer_email:
-    widget: "text_input"
-    label: "Security Officer Email"
-  privacy_officer_name:
-    widget: "text_input"
-    label: "Privacy Officer Name"
-  privacy_officer_email:
-    widget: "text_input"
-    label: "Privacy Officer Email"
-
-doc_gen_settings:
-  _widget: "container"
-  _label: "📄 Document Generation Settings"
-  _columns: 2
-  combined_pdf_title:
-    widget: "text_input"
-    label: "Combined PDF Title"
-  combined_pdf_author:
-    widget: "text_input"
-    label: "Combined PDF Author"
-  show_review_committee:
-    widget: "toggle"
-    label: "Show Review Committee"
-  review_committee:
-    widget: "text_area"
-    label: "Review Committee (one name per line)"
-    height: 100
-
 version_control:
   _widget: "expander"
-  _label: "🔧 Advanced Version & History Control"
+  _label: "🔧 Document Versioning & Formatting"
   release_version:
     widget: "text_input"
     label: "Global Release Version (e.g., v1.0.0)"
-  release_commit_prefix:
-    widget: "text_input"
-    label: "Hotfix Commit Prefix"
   global_release_history_style:
     widget: "selectbox"
     label: "Global Release History Style"
     options: ["append", "replace"]
+  release_commit_prefix:
+    widget: "text_input"
+    label: "Hotfix Commit Prefix"
   _divider: true
   _header: "Show Version History in Documents:"
   _columns: 3
@@ -76,6 +26,52 @@ version_control:
   combined_pdf_show_revision_history:
     widget: "toggle"
     label: "Combined PDF"
+
+company_info:
+  _widget: "expander"
+  _label: "🏢 Organization & Policy Information"
+  company_name:
+    widget: "text_input"
+    label: "Company Full Name"
+  company:
+    widget: "text_input"
+    label: "Company Short Name"
+  company_website:
+    widget: "text_input"
+    label: "Company Website"
+  company_service:
+    widget: "text_input"
+    label: "Company Service Description"
+  company_service_user_types:
+    widget: "text_input"
+    label: "Company Service User Types"
+  security_officer_name:
+    widget: "text_input"
+    label: "Security Officer Name"
+  security_officer_email:
+    widget: "text_input"
+    label: "Security Officer Email"
+  privacy_officer_name:
+    widget: "text_input"
+    label: "Privacy Officer Name"
+  privacy_officer_email:
+    widget: "text_input"
+    label: "Privacy Officer Email"
+  policy_website:
+    widget: "text_input"
+    label: "Policy Website URL"
+  combined_pdf_title:
+    widget: "text_input"
+    label: "Combined PDF Title"
+  combined_pdf_author:
+    widget: "text_input"
+    label: "Combined PDF Author"
+  show_review_committee:
+    widget: "toggle"
+    label: "Show Review Committee"
+  review_committee:
+    widget: "text_area"
+    label: "Review Committee (one name per line)"
 
 pdf_fonts:
   _widget: "container"
@@ -90,14 +86,10 @@ pdf_fonts:
   pdf_code_font:
     widget: "text_input"
     label: "Code Block Font"
-
-compliance_frameworks_section:
-  _widget: "expander"
-  _label: "🛡️ Compliance Frameworks"
-  _help: "Select the compliance frameworks that apply to your organization."
-  compliance_frameworks:
-    _widget: "toggle_group" # Special widget to render a dict of booleans
-    _columns: 4
+  pdf_odt_reference_doc:
+    widget: "text_input"
+    label: "ODT Reference Doc Path (Optional)"
+    help: "Path to a .odt file with custom styles for ODT output."
 
 service_offerings:
   _widget: "expander"
@@ -106,28 +98,12 @@ service_offerings:
   service_types:
     _widget: "dict_of_toggles" # Special widget for nested boolean dicts
 
-audit_status:
+compliance_frameworks:
   _widget: "expander"
-  _label: "📊 Audit & Compliance Status"
-  _help: "Manage the status of your compliance audits."
-  hipaa_audit:
-    _widget: "dict_group"
-    _label: "HIPAA Audit"
-    in_progress:
-      widget: "toggle"
-      label: "In Progress"
-    completed:
-      widget: "toggle"
-      label: "Completed"
-    completed_date:
-      widget: "text_input"
-      label: "Completion Date"
-  soc2_audit:
-    _widget: "dict_group"
-    _label: "SOC 2 Audit"
-    in_progress:
-      widget: "toggle"
-      label: "In Progress"
+  _label: "🛡️ Compliance Frameworks"
+  _help: "Select the compliance frameworks that apply to your organization."
+  compliance_frameworks:
+    _widget: "dict_of_frameworks" # A new, custom widget type
 
 vendor_management:
   _widget: "expander"
@@ -171,3 +147,45 @@ approved_tech_stack:
       approved_for:
         widget: "text_area"
         label: "Approved For (one per line)"
+  approved_os:
+    _widget: "dict_group"
+    _label: "Approved Operating Systems"
+    workstations:
+      _widget: "dict_group"
+      _label: "Workstations"
+      linux:
+        widget: "text_area"
+        label: "Linux (one per line)"
+      macos:
+        widget: "text_area"
+        label: "macOS (one per line)"
+      windows:
+        widget: "text_area"
+        label: "Windows (one per line)"
+    servers:
+      _widget: "dict_group"
+      _label: "Servers"
+      linux:
+        widget: "text_area"
+        label: "Linux (one per line)"
+
+work_environment:
+  _widget: "expander"
+  _label: "🏠 Work Environment"
+  remote_work:
+    _widget: "dict_of_toggles"
+  byod:
+    _widget: "dict_of_toggles"
+
+security_testing:
+  _widget: "expander"
+  _label: "🔬 Security Testing"
+  audit_penetration_external:
+    _widget: "dict_group"
+    _label: "External Penetration Test"
+  audit_penetration_internal:
+    _widget: "dict_group"
+    _label: "Internal Penetration Test"
+  vulnerability_scanner:
+    _widget: "dict_group"
+    _label: "Vulnerability Scanner"

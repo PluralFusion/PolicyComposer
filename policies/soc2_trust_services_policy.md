@@ -1,6 +1,6 @@
 # SOC2 Trust Services Policy
 
-{% if compliance_frameworks.soc2 %}
+{% if compliance_frameworks.soc2.supported %}
 This policy outlines {{ company }}'s commitment to meeting the Trust Services Criteria (TSC) established by the AICPA for SOC2 compliance.
 
 ## Trust Services Criteria Overview

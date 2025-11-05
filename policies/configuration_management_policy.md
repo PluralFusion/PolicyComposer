@@ -1,12 +1,12 @@
 
 # Configuration Management Policy
 
-{% if hipaa %}
+{% if compliance_frameworks.hipaa.supported %}
 ## HIPAA Compliance Context
 This policy implements the requirements of HIPAA § 164.310(a)(2)(iii) - Access Control & Validation Procedures, ensuring consistent and secure configuration of systems that process or store ePHI.
 {% endif %}
 
-{% if soc2 %}
+{% if compliance_frameworks.soc2.supported %}
 ## SOC2 Compliance Context
 This policy supports SOC2 Common Criteria (CC) 7.1 and CC 8.1, addressing system configuration standardization, change management, and security baseline requirements.
 {% endif %}
@@ -15,12 +15,12 @@ This policy supports SOC2 Common Criteria (CC) 7.1 and CC 8.1, addressing system
 
 ## Applicable Standards
 
-{% if hitrust %}
+{% if compliance_frameworks.hitrust.supported %}
 ### HITRUST Common Security Framework
 * 06 - Configuration Management
 {% endif %}
 
-{% if hipaa %}
+{% if compliance_frameworks.hipaa.supported %}
 ### HIPAA Security Rule
 * 164.310(a)(2)(iii) Access Control & Validation Procedures
 {% endif %}
@@ -50,8 +50,8 @@ This policy supports SOC2 Common Criteria (CC) 7.1 and CC 8.1, addressing system
    * All front-end functionality is separated from backend systems through appropriate network segmentation.
    * System clocks are synchronized using NTP, with restricted access to time modifications.
    * Security tools are implemented across all systems:
-{% for vendor in security_vendors %}
-     * {{ vendor }} for security monitoring and threat detection
+{% for vendor in vendors if 'Security' in vendor.services %}
+     * {{ vendor.name }} for security monitoring and threat detection
 {% endfor %}
 
 6. **Infrastructure Management**

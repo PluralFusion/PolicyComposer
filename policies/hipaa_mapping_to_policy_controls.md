@@ -1,3 +1,4 @@
+{% if compliance_frameworks.hipaa.supported %}
 # HIPAA Mappings to {{ company }} Controls
 
 Below is a list of HIPAA Safeguards and Requirements and the {{ company }} controls in place to meet those.
@@ -36,6 +37,7 @@ Business Associate Contracts or Other Arrangements - 164.314(a)(1)(i) | Business
 --- | ---
 Policies and Procedures - 164.316(a) | Policy Management Policy
 Documentation - 164.316(b)(1)(i) | Policy Management Policy
+{% endif %}
 
 | **HITECH Act - Security Provisions** HIPAA Rule | {{ company }} Control
 --- | ---

@@ -1,11 +1,11 @@
 # Disaster Recovery Policy
 
-{% if hipaa %}
+{% if compliance_frameworks.hipaa.supported %}
 ## HIPAA Compliance Context
 This policy implements the requirements of HIPAA § 164.308(a)(7)(i) - Contingency Plan, ensuring the establishment and implementation of procedures for responding to emergencies or disasters affecting systems containing ePHI.
 {% endif %}
 
-{% if soc2 %}
+{% if compliance_frameworks.soc2.supported %}
 ## SOC2 Compliance Context
 This policy supports SOC2 Common Criteria (CC) 7.5 and A1.1, addressing business continuity and disaster recovery planning to ensure system availability and data protection during disruptive events.
 {% endif %}
@@ -17,14 +17,14 @@ This policy aligns with HITRUST CSF controls for business continuity, disaster r
 
 ## Service-Specific Recovery Procedures
 
-{% if service_types.saas %}
+{% if service_types.saas.enabled %}
 ### SaaS Platform Recovery
 * Full platform recovery with automated failover
 * Customer data protection and availability
 * Service continuity management
 {% endif %}
 
-{% if service_types.paas %}
+{% if service_types.paas.enabled %}
 ### PaaS Environment Recovery
 * Core infrastructure restoration
 * Customer environment isolation
@@ -65,14 +65,14 @@ The following objectives have been established for this plan:
 
 This Disaster Recovery Policy aligns with multiple regulatory frameworks and industry standards:
 
-{% if hipaa %}
+{% if compliance_frameworks.hipaa.supported %}
 ### HIPAA Requirements
 * § 164.308(a)(7) - Contingency Plan
 * § 164.308(a)(7)(ii)(B) - Disaster Recovery Plan
 * § 164.308(a)(7)(ii)(C) - Emergency Mode Operation Plan
 {% endif %}
 
-{% if soc2 %}
+{% if compliance_frameworks.soc2.supported %}
 ### SOC2 Requirements
 * CC 7.5 - Business Continuity and Disaster Recovery
 * A1.1 - Availability Planning and Monitoring
@@ -153,13 +153,13 @@ Security monitoring and response by:
 
 ## Recovery Time Objectives (RTO)
 
-{% if SaaS %}
+{% if service_types.saas.enabled %}
 ### SaaS Platform
 * Critical Systems: 4 hours
 * Non-Critical Systems: 24 hours
 {% endif %}
 
-{% if PaaS %}
+{% if service_types.paas.enabled %}
 ### PaaS Infrastructure
 * Core Platform Services: 4 hours
 * Customer Environments with DR Service: 8 hours
@@ -340,13 +340,6 @@ The following teams have been developed and trained to respond to a contingency 
    * Monitor system performance
 
 {% if data_storage_vendors %}
-4. Vendor Coordination {# This check is kept for backward compatibility but logic is updated #}
-{% for vendor in vendors if 'Data Storage' in vendor.services %}
-   * Coordinate with {{ vendor.name }} for:
-     * Service restoration
-     * Data synchronization
-     * Performance monitoring
-{% endfor %}
 {% endif %}
 
 5. Communication

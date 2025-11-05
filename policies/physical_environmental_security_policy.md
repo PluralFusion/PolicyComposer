@@ -10,7 +10,7 @@ This policy defines {{ company }}'s requirements for physical and environmental 
 * Device and Media Controls - §164.310(d)(1)
 {% endif %}
 
-{% if compliance_frameworks.soc2 %}
+{% if compliance_frameworks.soc2.supported %}
 ## SOC2 Physical Security Requirements
 * CC6.4 - Physical Access Controls
 * CC6.5 - Environmental Protection
@@ -33,7 +33,7 @@ This policy defines {{ company }}'s requirements for physical and environmental 
    * Document storage
    * Backup media storage
 
-{% if remote_work_allowed %}
+{% if remote_work.enabled %}
 ### Remote Work Locations
 1. Home Office Requirements
    * Dedicated workspace recommended

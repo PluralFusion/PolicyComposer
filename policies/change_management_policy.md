@@ -1,6 +1,6 @@
 # Change Management and System Development Policy
 
-{% if soc2 %}
+{% if compliance_frameworks.soc2.supported %}
 This policy defines {{ company }}'s approach to change management and system development in accordance with SOC2 requirements.
 
 ## Scope

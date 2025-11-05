@@ -21,18 +21,18 @@ should create the following output filenames:
 
 ## Example Content Formatting
 
-{% if compliance_frameworks.hipaa %}
+{% if compliance_frameworks.hipaa.supported %}
 ## HIPAA Requirements
 This policy supports 45 CFR § 164.312(a)(1) \- Access Control.  
 All ePHI access must be logged and reviewed.  
 {% endif %}  
 
-{% if compliance_frameworks.hitrust %}
+{% if compliance_frameworks.hitrust.supported %}
 ## HITRUST CSF Requirements
 This policy maps to control vX.Y of the HITRUST Common Security Framework.  
 {% endif %}  
 
-{% if compliance_frameworks.soc2 %}
+{% if compliance_frameworks.soc2.supported %}
 ## SOC2 Trust Criteria
 This policy addresses Common Criteria (CC) 6.1.  
 {% endif %}
@@ -40,29 +40,29 @@ This policy addresses Common Criteria (CC) 6.1.
 ## Compliance (notice nested jinja)
 {{ company }} provides compliant hosted software infrastructure for its Customers.  
 
-{% if compliance_frameworks.hipaa %}  
+{% if compliance_frameworks.hipaa.supported %}  
 {{ company }} is HIPAA compliant.  
-{% if hipaa_audit_inprogress %}  
+{% if compliance_frameworks.hipaa.audit.in_progress %}  
 {{ company }} undergoing a HIPAA compliance audit by a 3rd party compliance firm to validate and map organizational policies and technical settings to HIPAA rules.  
 {% endif %}  
-{% if hipaa_audit_completed %}   
-{{ company }} has been through a HIPAA compliance audit by a national, 3rd party compliance firm, to validate and map organizational policies and technical settings to HIPAA rules. This audit was last completed on {{ hipaa_audit_completed_date }}.  
+{% if compliance_frameworks.hipaa.audit.completed %}   
+{{ company }} has been through a HIPAA compliance audit by a national, 3rd party compliance firm, to validate and map organizational policies and technical settings to HIPAA rules. This audit was last completed on {{ compliance_frameworks.hipaa.audit.completed_date }}.  
 {% endif %}
 {% endif %}  
 
-{% if compliance_frameworks.hitrust %}  
+{% if compliance_frameworks.hitrust.supported %}  
 {{ company }} is compliant with the HITRUST CSF.  
-{% if hitRUST_audit_inprogress %}  
+{% if compliance_frameworks.hitrust.audit.in_progress %}  
 {{ company }} is currently undergoing a HITRUST audit to achieve HITRUST Certification.  
 {% endif %}  
-{% if hitRUST_audit_completed %}  
-{{ company }} has been through a HITRUST audit and achieved HITRUST Certification on {{ hitRUST_certification_date }}.  
+{% if compliance_frameworks.hitrust.audit.completed %}  
+{{ company }} has been through a HITRUST audit and achieved HITRUST Certification on {{ compliance_frameworks.hitrust.audit.completed_date }}.  
 {% endif %}
 {% endif %}  
 
 {% if show_internal_notes %}  
 Internal Note: This section must be reviewed by {{ security_officer_name }}  
-by Q4. This note will only appear if show_internal_notes is true in the config.  
+by Q4. This note will only appear if `show_internal_notes` is true in the config.  
 {% endif %}
 
 ## **Basic Intro Example (with Jinja2 variables)**

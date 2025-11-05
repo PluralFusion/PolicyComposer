@@ -36,7 +36,7 @@
 * Client-side vulnerabilities
 {% endif %}
 
-{% if compliance_frameworks.soc2 %}
+{% if compliance_frameworks.soc2.supported %}
 ## SOC2 Incident Response Requirements
 
 ### Security Incidents (CC7.3, CC7.4)
@@ -126,7 +126,7 @@ The incident response process addresses:
 * 164.308(a)(6)(ii) – Response and Reporting
 {% endif %}
 
-{% if iso27001 %}
+{% if compliance_frameworks.iso27001.supported %}
 ### ISO 27001 Controls
 * A.16.1.1 - Responsibilities and procedures
 * A.16.1.2 - Reporting information security events
@@ -240,13 +240,6 @@ The incident response processes are reviewed and evaluated regularly for effecti
 1. Annual testing of the incident response plan
 2. Regular training of response team members
 3. Updates to procedures based on lessons learned
-4. Integration of new security tools and capabilities:
-{% for vendor in security_vendors %}
-   * {{ vendor }} for security monitoring and response
-{% endfor %}
-{% for vendor in monitoring_vendors %}
-   * {{ vendor }} for system and performance monitoring
-{% endfor %}
 
 ### Security Tooling and Monitoring
 * {{ vulnerability_scanner.name }} by {{ vulnerability_scanner.provider }} is used to {{ vulnerability_scanner.functions }}
@@ -254,7 +247,7 @@ The incident response processes are reviewed and evaluated regularly for effecti
 * Regular vulnerability assessments and remediation
 * Integration with approved monitoring and logging platforms
 
-{% if soc2 %}
+{% if compliance_frameworks.soc2.supported %}
 ### SOC2 Monitoring and Reporting Requirements
 
 #### Continuous Monitoring (CC3.2, CC4.1)

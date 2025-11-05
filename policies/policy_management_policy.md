@@ -1,11 +1,11 @@
 # Policy Management Policy
 
-{% if hipaa %}
+{% if compliance_frameworks.hipaa.supported %}
 ## HIPAA Compliance Context
 This policy addresses the requirements of HIPAA § 164.316(a) - Policies and Procedures and § 164.316(b)(1)(i) - Documentation. It establishes a framework for maintaining, updating, and managing all organizational policies in a compliant manner.
 {% endif %}
 
-{% if soc2 %}
+{% if compliance_frameworks.soc2.supported %}
 ## SOC2 Compliance Context
 This policy supports SOC2 Common Criteria (CC) 2.1 and CC 2.2, ensuring that information security policies are established, communicated, and periodically reviewed and updated.
 {% endif %}
@@ -33,11 +33,11 @@ This policy supports SOC2 Common Criteria (CC) 2.1 and CC 2.2, ensuring that inf
 	2. Backup storage of all policies is done with Box.
 6. The policies and information security policies are reviewed and audited annually. Issues that come up as part of this process are reviewed by {{ company }} management to assure all risks and potential gaps are mitigated and/or fully addressed. 
 
-{% if hitRUST %}
+{% if compliance_frameworks.hitrust.supported %}
 7. {{ company }} utilizes the HITRUST MyCSF framework to track compliance with the HITRUST CSF on an annual basis. 
 {% endif %}
 
-{% if hipaa %}
+{% if compliance_frameworks.hipaa.supported %}
 8. {{ company }} tracks HIPAA compliance and publishes results at {{ hipaa_website }}.
 {% endif %}
 

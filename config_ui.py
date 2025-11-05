@@ -166,6 +166,33 @@ def render_widget(key, definition, data_node):
                                     details[sub_key] = st.toggle(sub_key.replace('_', ' ').title(), value=sub_value, key=f"toggle_{service_name}_{sub_key}")
                                 i += 1
 
+    elif widget_type == "dict_of_frameworks":
+        # Custom widget for the nested compliance_frameworks structure
+        if key not in data_node:
+            data_node[key] = {}
+        target_dict = data_node[key]
+
+        for framework_name, details in target_dict.items():
+            if isinstance(details, dict) and 'supported' in details:
+                with st.container(border=True):
+                    st.subheader(f"Framework: {framework_name.upper()}")
+                    details['supported'] = st.toggle(f"Support {framework_name.upper()}", value=details.get('supported', False), key=f"toggle_framework_{framework_name}")
+
+                    if details['supported']:
+                        audit_details = details.get('audit', {})
+                        if isinstance(audit_details, dict):
+                            st.markdown("---")
+                            st.write("**Audit Status**")
+                            cols = st.columns(2)
+                            with cols[0]:
+                                audit_details['in_progress'] = st.toggle("Audit In Progress", value=audit_details.get('in_progress', False), key=f"audit_ip_{framework_name}")
+                                audit_details['completed'] = st.toggle("Audit Completed", value=audit_details.get('completed', False), key=f"audit_comp_{framework_name}")
+                            with cols[1]:
+                                audit_details['provider'] = st.text_input("Audit Provider", value=audit_details.get('provider', ''), key=f"audit_prov_{framework_name}")
+                                audit_details['completed_date'] = st.text_input("Completion Date", value=audit_details.get('completed_date', ''), key=f"audit_date_{framework_name}", help="Use YYYY-MM-DD format.")
+                            # Write the updated audit details back to the main details dict
+                            details['audit'] = audit_details
+
     elif widget_type == "dict_group":
         # Special widget for a group of fields under a single config key (like hipaa_audit)
         # **FIX:** The data is nested one level deeper, under the 'key' itself.

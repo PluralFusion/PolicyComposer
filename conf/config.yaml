@@ -1,10 +1,23 @@
+# Document Versioning & Formatting
+release_version: v.0.0.5
+release_commit_prefix: 'RELEASE:'
+md_show_revision_history: true
+pdf_show_revision_history: true
+combined_pdf_show_revision_history: false
+global_release_history_style: append
+show_internal_notes: true
+pdf_main_font: DejaVu Sans
+pdf_header_font: Lato Semibold
+pdf_code_font: DejaVu Sans Mono
+
+# Company Information
 company_name: ACME LTD
 company: ACME
 company_website: https://example.com
 company_service: widgets, thingamabobs, and doodads
 company_service_user_types: coyotes, hunters, and other cartoon characters
 security_officer_name: Wile E. Coyote
-security_office_email: security@example.com
+security_officer_email: security@example.com
 privacy_officer_name: Elmer Fudd
 privacy_officer_email: privacy@example.com
 policy_website: https://example.com/policy
@@ -16,16 +29,9 @@ show_review_committee: true
 review_committee:
 - Wile E. Coyote
 - Elmer Fudd
-release_version: v.0.0.2
-release_commit_prefix: 'RELEASE:'
-md_show_revision_history: true
-pdf_show_revision_history: true
-combined_pdf_show_revision_history: false
-global_release_history_style: append
-show_internal_notes: true
-pdf_main_font: DejaVu Sans
-pdf_header_font: Lato Semibold
-pdf_code_font: DejaVu Sans Mono
+
+
+# Service Types Offered by the Company
 service_types:
   saas:
     enabled: true
@@ -70,11 +76,75 @@ service_types:
     - name: AI/ML Service
       description: A service offering AI and machine learning capabilities
 ephi_access: true
+
+
+
+# Compliance Frameworks
+compliance_frameworks:
+  hipaa: 
+    supported: true
+    ephi_access: true
+    audit:  
+      in_progress: false
+      provider: ''
+      completed: false
+      completed_date: ''
+
+  hitrust:
+    supported: false
+    audit:  
+      in_progress: false
+      completed: false
+      completed_date: ''
+
+  soc2:
+    supported: false
+    audit:  
+      in_progress: false
+      completed: false
+      completed_date: ''
+  iso27001:
+    supported: false
+    audit:  
+      in_progress: false
+      completed: false
+      completed_date: ''
+  pci_dss:
+    supported: false
+    audit:  
+      in_progress: false
+      completed: false
+      completed_date: ''
+  gdpr:
+    supported: false
+    audit:  
+      in_progress: false
+      completed: false
+      completed_date: ''
+  ccpa:
+    supported: false
+    audit:  
+      in_progress: false
+      completed: false
+      completed_date: ''
+  other:
+    description: ''
+    supported: false
+    audit:  
+      in_progress: false
+      completed: false
+      completed_date: ''
+
+
+
 vendor_management_policy: true
 vendor_risk_assessment: true
 vendor_security_requirements: true
 vendor_monitoring_auditing: true
 vendor_termination_procedures: true
+
+
+
 vendors:
 - name: AWS
   services:
@@ -100,29 +170,10 @@ vulnerability_scanner:
   name: Nessus Scanner
   provider: Tenable
   functions: consistently scan, identify, and address vulnerabilities
-compliance_frameworks:
-  hipaa: true
-  hitrust: true
-  soc2: true
-  iso27001: false
-  pci_dss: false
-  gdpr: false
-  ccpa: false
-  other: false
-  other_description: ''
-hipaa_audit:
-  in_progress: false
-  completed: true
-  completed_date: YYYY-MM-DD
-hitrust_audit:
-  in_progress: false
-  completed: false
-  certification_date: ''
-soc2_audit:
-  in_progress: false
-  completed: false
+
+
 audit_penetration_external:
-  performed: true
+  performed: false
   frequency: bi-annual
   auditor_name: a third-party security firm
   findings_addressed: true
@@ -131,6 +182,8 @@ audit_penetration_internal:
   frequency: with each major release
   auditor_name: PluralFusion
   findings_addressed: true
+
+# Work Environment
 remote_work:
   enabled: true
   models:
@@ -251,4 +304,3 @@ approved_os:
     linux:
     - name: Debian 12
     - name: Ubuntu 24.04 LTS
-security_officer_email: ''

@@ -1,16 +1,16 @@
 # Vendor Management Policy
 
-{% if hipaa %}
+{% if compliance_frameworks.hipaa.supported %}
 ## HIPAA Compliance Context
 This policy implements HIPAA requirements for managing business associates and third-party service providers that handle ePHI.
 {% endif %}
 
-{% if soc2 %}
+{% if compliance_frameworks.soc2.supported %}
 ## SOC2 Compliance Context
 This policy defines {{ company }}'s approach to managing third-party vendors and service providers in accordance with SOC2 requirements for vendor management and risk assessment.
 {% endif %}
 
-{% if hitrust %}
+{% if compliance_frameworks.hitrust.supported %}
 ## HITRUST Compliance Context
 This policy aligns with HITRUST controls for vendor management, third-party assurance, and supply chain protection.
 {% endif %}
@@ -18,35 +18,22 @@ This policy aligns with HITRUST controls for vendor management, third-party assu
 ## Current Vendor Landscape
 
 ### Infrastructure and Platform Providers
-{% if platform_vendors %}
+{% if vendors %}
 Primary infrastructure is provided by:
-{% for vendor in platform_vendors %}
-* {{ vendor }}{% if vendor in baa_vendors %} (with signed BAA){% endif %}
+{% for vendor in vendors if 'Platform' in vendor.services %}
+* {{ vendor.name }}{% if vendor.baa_signed %} (with signed BAA){% endif %}
 {% endfor %}
 {% endif %}
 
 ### Data Storage Providers
-{% if data_storage_vendors %}
+{% if vendors %}
 Data storage services are provided by:
-{% for vendor in data_storage_vendors %}
-* {{ vendor }}{% if vendor in baa_vendors %} (with signed BAA){% endif %}
+{% for vendor in vendors if 'Data Storage' in vendor.services %}
+* {{ vendor.name }}{% if vendor.baa_signed %} (with signed BAA){% endif %}
 {% endfor %}
 {% endif %}
 
 ### Security and Monitoring
-{% if security_vendors %}
-Security services are provided by:
-{% for vendor in security_vendors %}
-* {{ vendor }}
-{% endfor %}
-{% endif %}
-
-{% if monitoring_vendors %}
-Monitoring services are provided by:
-{% for vendor in monitoring_vendors %}
-* {{ vendor }}
-{% endfor %}
-{% endif %}
 
 ## Vendor Risk Assessment
 
@@ -83,7 +70,7 @@ Monitoring services are provided by:
 * Support responsibilities
 * Issue resolution times
 
-{% if SaaS %}
+{% if service_types.saas.enabled %}
 ## SaaS Vendor Requirements
 * Data processing agreements
 * Service availability guarantees
@@ -91,7 +78,7 @@ Monitoring services are provided by:
 * Multi-tenant security controls
 {% endif %}
 
-{% if PaaS %}
+{% if service_types.paas.enabled %}
 ## PaaS Vendor Requirements
 * Infrastructure security standards
 * Container security requirements
@@ -99,7 +86,7 @@ Monitoring services are provided by:
 * Deployment pipeline security
 {% endif %}
 
-{% if Medical_Device %}
+{% if service_types.medical_device.enabled %}
 ## Medical Device Vendor Requirements
 * FDA compliance requirements
 * Device security standards
@@ -107,7 +94,7 @@ Monitoring services are provided by:
 * Maintenance procedures
 {% endif %}
 
-{% if Mobile_App %}
+{% if service_types.mobile_app.enabled %}
 ## Mobile Service Vendor Requirements
 * Mobile security standards
 * App store compliance
@@ -160,12 +147,6 @@ Monitoring services are provided by:
 ## Documentation Requirements
 
 1. Vendor Agreements:
-{% if baa_vendors %}
-   * Business Associate Agreements for:
-{% for vendor in baa_vendors %}
-     * {{ vendor }}
-{% endfor %}
-{% endif %}
    * Service Level Agreements
    * Security Requirements Documentation
 
@@ -175,17 +156,7 @@ Monitoring services are provided by:
    * Compliance Verifications
    * Risk Assessment Reports
 
-3. Monitoring and Auditing:
-{% if monitoring_vendors %}
-   * Monitoring reports from:
-{% for vendor in monitoring_vendors %}
-     * {{ vendor }}
-{% endfor %}
-{% endif %}
-   * Security scan results from {{ vulnerability_scanner.name }}
-   * Incident reports and resolutions
-
-{% if soc2 %}
+{% if compliance_frameworks.soc2.supported %}
 ## SOC2 Vendor Management Controls
 * Vendor risk assessment procedures
 * Security control validation
@@ -193,7 +164,7 @@ Monitoring services are provided by:
 * Documentation standards
 {% endif %}
 
-{% if hipaa %}
+{% if compliance_frameworks.hipaa.supported %}
 ## HIPAA Business Associate Management
 * BAA requirements and maintenance
 * ePHI handling procedures
@@ -201,7 +172,7 @@ Monitoring services are provided by:
 * Breach notification procedures
 {% endif %}
 
-{% if hitrust %}
+{% if compliance_frameworks.hitrust.supported %}
 ## HITRUST Vendor Controls
 * Supply chain security
 * Third-party assurance

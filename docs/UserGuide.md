@@ -9,7 +9,13 @@ This guide provides detailed instructions to set up, run, and customize PolicyCo
 - [Customizing Your Policies](#customizing-your-policies)
   - [Editing Configuration (`conf/config.yaml`)](#editing-configuration-confconfigyaml)
   - Editing Policy Content (`policies/*.md`)
-- Versioning Your Policies
+- [Versioning Your Policies](#versioning-your-policies)
+  - [Global Releases](#global-releases)
+  - [Hotfixes](#hotfixes)
+
+---
+
+## How It Works
   - Global Releases
   - Hotfixes
 
@@ -117,6 +123,9 @@ chmod +x scripts/compose.sh
 Once the script finishes, your generated documents will be available directly in the project folder:
 -   Processed Markdown files are in the `md/` directory.
 -   Generated PDF files are in the `pdf/` directory.
+-   Processed Markdown files are in the `output/md/` directory.
+-   Generated PDF files are in the `output/pdf/` directory.
+-   Generated ODT files (for word processors) are in the `output/odt/` directory.
 
 ---
 

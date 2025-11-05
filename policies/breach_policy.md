@@ -27,15 +27,6 @@ This policy supports:
 * Evidence preservation standards
 {% endif %}
 
-## Breach Response Overview
-{{ company }} implements a comprehensive breach response program that includes:
-* Immediate incident containment
-* Thorough investigation procedures
-* Customer notification processes
-* Regulatory reporting requirements
-
-{% if ndor Responsibilities
-{% for vendor is ie
 ## Applicable Standards from the HITRUST Common Security Framework
 
 * 11.a Reporting Information Security Events

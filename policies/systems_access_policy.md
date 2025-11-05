@@ -5,7 +5,7 @@
 This policy addresses HIPAA access control and workforce authentication requirements to protect ePHI.
 {% endif %}
 
-{% if compliance_frameworks.soc2 %}
+{% if compliance_frameworks.soc2.supported %}
 ## SOC2 Compliance Context
 This policy supports SOC2 Security (Common Criteria) for identity, access management, and monitoring.
 {% endif %}
@@ -175,7 +175,7 @@ Workstations must use one of the following approved operating systems:
 
 ## Password Management
 
-{% if compliance_frameworks.soc2 %}
+{% if compliance_frameworks.soc2.supported %}
 ### SOC2 Authentication Requirements
 * Multi-factor authentication (MFA) required for all user access
 * Password complexity requirements aligned with NIST standards

@@ -33,7 +33,7 @@ This policy defines {{ company }}'s requirements for maintaining security and pr
    * Collaboration areas
    * Break rooms
 
-{% if remote_work_allowed %}
+{% if remote_work.enabled %}
 3. Remote Work Areas
    * Home offices
    * Temporary locations

@@ -1,11 +1,11 @@
 # Data Integrity Policy
 
-{% if hipaa %}
+{% if compliance_frameworks.hipaa.supported %}
 ## HIPAA Compliance Context
 This policy implements the requirements of HIPAA § 164.308(a)(8) - Evaluation, ensuring that technical controls maintain the integrity and availability of ePHI throughout its lifecycle.
 {% endif %}
 
-{% if soc2 %}
+{% if compliance_frameworks.soc2.supported %}
 ## SOC2 Compliance Context
 This policy supports SOC2 Processing Integrity criteria (PI 1.1, PI 1.2, PI 1.3) and Common Criteria (CC 6.1), ensuring data processing integrity, accuracy, and completeness through system configuration and monitoring.
 {% endif %}
@@ -21,21 +21,21 @@ All {{ company }} data exchanges occur on platforms maintained by our infrastruc
 
 ## Applicable Standards
 
-{% if hitrust %}
+{% if compliance_frameworks.hitrust.supported %}
 ### HITRUST Common Security Framework
 * 10.b - Input Data Validation
 * 06.d - Data Integrity Controls
 * 09.aa - Audit Logging
 {% endif %}
 
-{% if hipaa %}
+{% if compliance_frameworks.hipaa.supported %}
 ### HIPAA Security Rule
 * 164.308(a)(8) - Evaluation
 * 164.312(c)(1) - Data Integrity
 * 164.312(e)(2)(i) - Transmission Security
 {% endif %}
 
-{% if soc2 %}
+{% if compliance_frameworks.soc2.supported %}
 ### SOC2 Trust Services Criteria
 * CC6.7 - System Changes
 * PI1.1 - System Processing Integrity
@@ -46,17 +46,17 @@ All {{ company }} data exchanges occur on platforms maintained by our infrastruc
 
 * All access to Production Systems must be logged. This is done following the {{ company }} Auditing Policy.
 {% for vendor in vendors if 'Security' in vendor.services %}
-* All Production Systems must have {{ vendor.name }} deployed for continuous threat detection and prevention
+* All Production Systems must have {{ vendor.name }} deployed for continuous threat detection and prevention.
 {% endfor %}
 ### Malware Prevention
 
-* All Production Systems must have {{ security_vendors[0] }} deployed for continuous threat detection and prevention
+* All Production Systems must have appropriate tools deployed for continuous threat detection and prevention.
 * Regular malware scans are performed using {{ vulnerability_scanner.name }} by {{ vulnerability_scanner.provider }}
 * All Production Systems are restricted to {{ company }} business operations only
 
 ### Patch Management
 
-{% if soc2 %}
+{% if compliance_frameworks.soc2.supported %}
 * Patch management follows SOC2 change management requirements
 * All changes are documented and approved before implementation
 {% endif %}

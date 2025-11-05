@@ -2,12 +2,12 @@
 
 This policy defines {{ company }}'s requirements for using personal devices to access company resources.
 
-{% if byod_policy %}
+{% if byod.policy_enabled %}
 ## Scope
 
 This policy applies to all personal devices used to access {{ company }} systems, including:
 
-{% if byod_phone %}
+{% if byod.allowed_devices.phones %}
 ### Mobile Phones and Tablets
 * Smartphones
 * Tablets
@@ -15,7 +15,7 @@ This policy applies to all personal devices used to access {{ company }} systems
 * Other mobile computing devices
 {% endif %}
 
-{% if byod_computer %}
+{% if byod.allowed_devices.computers %}
 ### Personal Computers
 * Laptops
 * Desktop computers
@@ -23,7 +23,7 @@ This policy applies to all personal devices used to access {{ company }} systems
 * Home office equipment
 {% endif %}
 
-{% if byod_other %}
+{% if byod.allowed_devices.other_devices %}
 ### Other Devices
 * Smart watches
 * IoT devices

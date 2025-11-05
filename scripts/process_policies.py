@@ -11,13 +11,16 @@ policy_dir = 'policies'
 order_file = 'conf/policy_order.yaml' 
 history_file = 'build/git_history.json'
 
-# Output directories
-md_output_dir = 'md'
-pdf_output_dir = 'pdf'
-temp_combined_dir = 'temp_combined'
+# --- Output Directories ---
+base_output_dir = 'output'
+md_output_dir = os.path.join(base_output_dir, 'md')
+pdf_output_dir = os.path.join(base_output_dir, 'pdf')
+odt_output_dir = os.path.join(base_output_dir, 'odt')
+temp_combined_dir = os.path.join(base_output_dir, 'temp_combined')
 
 os.makedirs(md_output_dir, exist_ok=True)
 os.makedirs(pdf_output_dir, exist_ok=True)
+os.makedirs(odt_output_dir, exist_ok=True)
 os.makedirs(temp_combined_dir, exist_ok=True)
 
 # --- 2. Load Config & History ---
@@ -114,6 +117,7 @@ print(f"Processing {len(POLICY_FILES_LIST)} policy files from {order_file}...")
 pdf_font = config.get('pdf_main_font', 'Noto Sans')
 pdf_header_font = config.get('pdf_header_font', pdf_font) # Default to main font if not set
 pdf_code_font = config.get('pdf_code_font', 'Noto Sans Mono') # Good default
+odt_reference_doc = config.get('pdf_odt_reference_doc') # Path to a reference ODT file
 
 for policy_item in POLICY_FILES_LIST:
     try:
@@ -183,6 +187,25 @@ for policy_item in POLICY_FILES_LIST:
             input=pdf_content.encode('utf-8'),
             check=True
         )
+        
+        # 7. Create Individual ODT
+        odt_filename = rendered_filename.replace('.md', '.odt')
+        odt_path = os.path.join(odt_output_dir, odt_filename)
+        
+        print(f"  -> Converting to individual ODT: {odt_path}")
+        
+        pandoc_cmd_odt = [
+            'pandoc',
+            '--from=gfm',
+            '-o', odt_path,
+            '--metadata', f"title={rendered_title}"
+        ]
+        
+        # Add reference doc for styling if it's defined in the config
+        if odt_reference_doc and os.path.exists(odt_reference_doc):
+            pandoc_cmd_odt.extend(['--reference-doc', odt_reference_doc])
+
+        subprocess.run(pandoc_cmd_odt, input=pdf_content.encode('utf-8'), check=True)
         
         # 7. Save file for Combined PDF
         temp_combined_path = os.path.join(temp_combined_dir, rendered_filename)

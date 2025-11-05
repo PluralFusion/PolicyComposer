@@ -88,13 +88,19 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: processed-markdown-policies
-          path: md/
+          path: output/md/
 
       - name: Upload PDF Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: policy-pdfs
-          path: pdf/
+          path: output/pdf/
+          
+      - name: Upload ODT Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: policy-odts
+          path: output/odt/
           
       - name: Upload Font List Artifact
         uses: actions/upload-artifact@v4
@@ -117,7 +123,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: policy-pdfs
-          path: pdfs/
+          path: output/pdf/
           
       - name: Create GitHub Release
         env:
@@ -126,6 +132,5 @@ jobs:
           gh release create ${{ needs.build.outputs.release_version }} \
             --title "Policy Documents ${{ needs.build.outputs.release_version }}" \
             --notes "Official release of all policy documents for version ${{ needs.build.outputs.release_version }}." \
-            pdfs/combined_policies.pdf \
-            pdfs/
-
+            output/pdf/combined_policies.pdf \
+            output/pdf/

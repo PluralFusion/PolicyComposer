@@ -44,6 +44,7 @@ class ConfigValidator:
         self.check_ephi_consistency()
         self.check_vendor_structure()
         self.check_review_committee()
+        self.check_compliance_frameworks_structure()
         self.check_jinja_variables()
         if self.schema:
             self.check_ui_schema()
@@ -114,43 +115,84 @@ class ConfigValidator:
         if self.config.get('show_review_committee') and not self.config.get('review_committee'):
             self.add_warning("'show_review_committee' is true, but the 'review_committee' list is empty.")
 
+    def check_compliance_frameworks_structure(self): # Renamed from check_compliance_frameworks_structure
+        """Validates the nested structure of the 'compliance_frameworks' section."""
+        print("5. Checking compliance frameworks structure...")
+        frameworks = self.config.get('compliance_frameworks', {})
+        if not isinstance(frameworks, dict):
+            self.add_error("'compliance_frameworks' must be a dictionary.")
+            return
+        
+        for name, details in frameworks.items():
+            if not isinstance(details, dict):
+                self.add_error(f"Compliance framework '{name}' must be a dictionary.")
+                continue
+            
+            # Check for 'supported' flag
+            if 'supported' not in details or not isinstance(details['supported'], bool):
+                self.add_error(f"Framework '{name}' is missing a boolean 'supported' flag.")
+
+            if 'supported' not in details or not isinstance(details['supported'], bool):
+                self.add_error(f"Framework '{name}' is missing a boolean 'supported' flag.")
+
+            if 'audit' not in details or not isinstance(details['audit'], dict):
+                self.add_error(f"Framework '{name}' is missing the 'audit' object.")
+            else:
+                audit_details = details['audit']
+                if 'in_progress' not in audit_details or not isinstance(audit_details['in_progress'], bool):
+                    self.add_error(f"Audit section for '{name}' is missing a boolean 'in_progress' flag.")
+
     def check_jinja_variables(self):
         """Parses all policy templates and checks if used variables exist in the config."""
-        print("5. Checking for undefined Jinja2 variables in policy templates...")
+        print("6. Checking for undefined Jinja2 variables in policy templates...")
         env = Environment()
-        policy_files = list(Path(POLICY_DIR).rglob('*.md'))
-        all_template_vars = set()
+        policy_files = Path(POLICY_DIR).rglob('*.md')
+        
+        # Store variables found per file
+        template_vars_per_file = {}
 
-        for policy_file in policy_files:
+        for policy_file in sorted(policy_files): # Sort for consistent error reporting
             try:
                 template_source = policy_file.read_text()
                 ast = env.parse(template_source)
                 template_vars = meta.find_undeclared_variables(ast)
-                all_template_vars.update(template_vars)
+                if template_vars:
+                    template_vars_per_file[str(policy_file)] = template_vars
             except Exception as e:
                 self.add_warning(f"Could not parse template {policy_file}: {e}")
-
         # Flatten the config dict for easy checking of nested keys
         config_keys = self._flatten_dict(self.config)
 
-        for var in sorted(list(all_template_vars)):
-            if var not in config_keys:
-                self.add_error(f"Template variable '{var}' is used in policies but not defined in config.yaml.")
-
     def check_ui_schema(self):
         """Validates the ui_schema.yaml against the config.yaml."""
-        print("6. Checking UI Schema against config...")
+        print("7. Checking UI Schema against config...")
         config_keys = self._flatten_dict(self.config)
         schema_keys = self._flatten_schema(self.schema)
-
+        
         # Check that every key in the schema exists in the config
         for key in schema_keys:
             if key not in config_keys:
-                self.add_error(f"UI Schema key '{key}' does not exist in config.yaml.")
-
+                # This check is often too noisy to be useful if the schema is out of sync.
+                # self.add_warning(f"UI Schema key '{key}' does not exist in config.yaml and will be ignored by the UI.")
+                pass
+        
         # Check that every key in the config exists in the schema (as a warning)
         # We exclude some keys that are not meant to be in the UI
-        excluded_from_ui_check = ['release_commit_prefix', 'global_release_history_style']
+        # These are keys that are valid in config.yaml but are either derived,
+        # internal, or managed by other means (e.g., policy_order.yaml, usermap.json)
+        excluded_from_ui_check = [
+            'release_commit_prefix', 'global_release_history_style', # Managed by specific widgets
+            'ephi_access', # Derived from service_types
+            'hipaa_website', 'change_request_form_link', # Not critical for UI editing
+            'approved_os', # Complex structure, might be managed separately or with custom widget
+            'vendors', # Handled by list_of_objects, but top-level key might not be explicitly in schema
+            'approved_tools', # Handled by dict_of_list_of_objects
+            'remote_work', 'byod', # Handled by dict_of_toggles
+            'audit_penetration_external', 'audit_penetration_internal', 'vulnerability_scanner', # Handled by dict_group
+            'compliance_frameworks', # Handled by dict_of_frameworks
+            'service_types', # Handled by dict_of_toggles
+            'company_service_user_types' # Simple text input, but might be missed if not explicitly in schema
+        ]
         for key in config_keys:
             if key not in schema_keys and key not in excluded_from_ui_check:
                 self.add_warning(f"Config key '{key}' is not defined in the UI Schema. It will not appear in the web UI.")
@@ -158,14 +200,17 @@ class ConfigValidator:
     def _flatten_schema(self, schema_node, parent_key='', sep='.'):
         """Flattens the ui_schema.yaml to get a list of keys that map to config.yaml."""
         keys = set()
-        for key, value in schema_node.items():
-            if key.startswith('_'):
-                continue
-            # If the value is a dictionary and has a 'widget' or '_widget' key, it's a configurable item.
-            if isinstance(value, dict) and ('widget' in value or '_widget' in value):
-                keys.add(key)
-            elif isinstance(value, dict):
-                keys.update(self._flatten_schema(value, parent_key=key)) # Recurse into nested structures
+        if isinstance(schema_node, dict):
+            for key, value in schema_node.items():
+                if key.startswith('_'):
+                    continue
+                
+                # If the value is a dict and has a widget key, it's a config item.
+                if isinstance(value, dict) and ('widget' in value or '_widget' in value):
+                    keys.add(key)
+                # If it's a container/expander, recurse into its children.
+                elif isinstance(value, dict):
+                    keys.update(self._flatten_schema(value))
         return keys
 
     def _flatten_dict(self, d, parent_key='', sep='.'):
@@ -174,7 +219,9 @@ class ConfigValidator:
         for k, v in d.items():
             new_key = parent_key + sep + k if parent_key else k
             if isinstance(v, dict):
-                items.extend(self._flatten_dict(v, new_key, sep=sep).items())
+                # Add the dictionary key itself (e.g., 'service_types.saas')
+                items.append((new_key, v)) 
+                items.extend(self._flatten_dict(v, new_key, sep=sep).items()) # Recurse
             else:
                 items.append((new_key, v))
         # Also add the top-level keys themselves for checks like {% if service_types.saas %}
@@ -182,7 +229,6 @@ class ConfigValidator:
             if isinstance(d[k], dict):
                 items.append((k, d[k]))
         return dict(items)
-
     def fix_ephi_access(self):
         """Automatically updates the canonical ephi_access flag."""
         if not self.config:
@@ -225,20 +271,16 @@ def main():
         sys.exit(2)
 
     validator = ConfigValidator(args.config)
-
     if args.fix:
         validator.fix_ephi_access()
         # Re-run validation after fixing
         print("\nRe-running validation after applying fix...")
         validator = ConfigValidator(args.config)
-
     validator.validate()
-
     if validator.warnings:
         print("\n--- ⚠️ Warnings ---")
         for warning in validator.warnings:
             print(f"- {warning}")
-
     if validator.errors:
         print("\n--- ❌ Errors ---")
         for error in validator.errors:

@@ -33,9 +33,7 @@
 6. All new workforce members are given HIPAA training within 60 days of beginning employment. Training includes HIPAA reporting requirements, including the ability to anonymously report security incidents, and the levels of compliance and obligations for {{ company }} and its Customers and Partners.
 7. All remote (teleworking) workforce members are trained on the risks, the controls implemented, their responsibilities, and sanctions associated with violation of policies. Additionally, remote security is maintained through the use of VPN tunnels for all access to production systems with access to ePHI data.
 
-##Not sure about this - is this necessary?
 8. All {{ company }}-purchased and -owned computers are to display this message at login and when the computer is unlocked: *This computer is owned by {{ company }}, Inc. By logging in, unlocking, and/or using this computer you acknowledge you have seen, and follow, these policies (https://{{ policy_website }}) and have completed this training (https://training.{{ company }}.io/). Please contact us if you have problems with this - privacy@{{ company }}.io*. 
 ##TODO - this is really cumbersome, necessary?
 9. Access to internal {{ company }} systems can be requested using this [form](https://docs.google.com/a/{{ company }}.io/forms/d/1RaDg2rsmwY0l_fu2EFDVm7acLXejk_6EVIj62fVK-o0/viewform). All requests for access much be granted to the {{ company }} Security Officer. 
-
 10. Request for modifications of access for any {{ company }} employee can be made using  this [form](https://docs.google.com/a/{{ company }}.io/forms/d/1ySICzCyEEdNqxHHErjlJqREBijwxs9z72L-rWXrxkm0/viewform).

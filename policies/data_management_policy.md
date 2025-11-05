@@ -1,11 +1,11 @@
 # Data Management Policy
 
-{% if compliance_frameworks.hipaa %}
+{% if compliance_frameworks.hipaa.supported %}
 ## HIPAA Compliance Context
 This policy addresses HIPAA Security Rule requirements relevant to data backup, retention, and recoverability of ePHI.
 {% endif %}
 
-{% if compliance_frameworks.soc2 %}
+{% if compliance_frameworks.soc2.supported %}
 ## SOC2 Compliance Context
 This policy supports the SOC2 Trust Services Criteria for Availability, Confidentiality, and Processing Integrity as they relate to backup and recovery.
 {% endif %}
@@ -63,7 +63,7 @@ Violation of this policy and its procedures by workforce members may result in c
 * 164.310(d)(2)(iii) - Accountability
 * 164.310(d)(2)(iv) - Data Backup and Storage
 
-{% if compliance_frameworks.soc2 %}
+{% if compliance_frameworks.soc2.supported %}
 ## SOC2 Trust Services Criteria
 
 ### Availability
