@@ -127,6 +127,12 @@ jobs:
         with:
           name: policy-pdfs
           path: output/pdf/
+
+      - name: Download ODT Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: policy-odts
+          path: output/odt/
           
       - name: Create GitHub Release
         env:
@@ -135,5 +141,5 @@ jobs:
           gh release create ${{ needs.build.outputs.release_version }} \
             --title "Policy Documents ${{ needs.build.outputs.release_version }}" \
             --notes "Official release of all policy documents for version ${{ needs.build.outputs.release_version }}." \
-            output/pdf/combined_policies.pdf \
-            output/pdf/
+            output/pdf/*.pdf \
+            output/odt/*.odt
