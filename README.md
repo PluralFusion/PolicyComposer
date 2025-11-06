@@ -2,6 +2,14 @@
 
 This repository provides a complete build system for creating, managing, and versioning company policies. It uses a powerful [Jinja2](https://jinja.palletsprojects.com/en/stable/) templating engine, a Python build script, and GitHub Actions to automatically generate versioned Markdown and professional PDF documents.
 
+## Project Status
+We are currently using this to update our own HIPAA documentation so our focus is on HIPAA compliant documentation. Our goal is to incorporate SOC2 and other compliance documentation over time. 
+
+**If you have ideas or suggestions for how to improve this project [please create an issue to let us know](https://github.com/PluralFusion/PolicyComposer/issues).**
+
+### Contributions Welcome
+If you enjoy playing with Jinja2, canonicalization, or have document templates to contribute, **please  contribute or file an issue**.
+
 ## Table of Contents
 - [Why Use PolicyComposer?](#why-use-policycomposer)
 - [Workflow Overview](#workflow-overview)
