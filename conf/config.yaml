@@ -1,5 +1,5 @@
 # Document Versioning & Formatting
-release_version: v.0.0.5
+release_version: v.0.0.6
 release_commit_prefix: 'RELEASE:'
 md_show_revision_history: true
 pdf_show_revision_history: true
