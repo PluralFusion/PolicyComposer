@@ -134,6 +134,12 @@ jobs:
           name: policy-odts
           path: output/odt/
           
+      - name: Download Markdown Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: processed-markdown-policies
+          path: output/md/
+          
       - name: Create GitHub Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -142,4 +148,5 @@ jobs:
             --title "Policy Documents ${{ needs.build.outputs.release_version }}" \
             --notes "Official release of all policy documents for version ${{ needs.build.outputs.release_version }}." \
             output/pdf/*.pdf \
-            output/odt/*.odt
+            output/odt/*.odt \
+            output/md/*.md
