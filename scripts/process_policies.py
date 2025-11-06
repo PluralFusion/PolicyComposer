@@ -13,15 +13,13 @@ history_file = 'build/git_history.json'
 
 # --- Output Directories ---
 base_output_dir = 'output'
-md_output_dir = os.path.join(base_output_dir, 'md')
-pdf_output_dir = os.path.join(base_output_dir, 'pdf')
-odt_output_dir = os.path.join(base_output_dir, 'odt')
-temp_combined_dir = os.path.join(base_output_dir, 'temp_combined')
-
-os.makedirs(md_output_dir, exist_ok=True)
-os.makedirs(pdf_output_dir, exist_ok=True)
-os.makedirs(odt_output_dir, exist_ok=True)
-os.makedirs(temp_combined_dir, exist_ok=True)
+dirs_to_create = [
+    os.path.join(base_output_dir, 'md'),
+    os.path.join(base_output_dir, 'pdf'),
+    os.path.join(base_output_dir, 'odt'),
+    os.path.join(base_output_dir, 'temp_combined')
+]
+[os.makedirs(d, exist_ok=True) for d in dirs_to_create]
 
 # --- 2. Load Config & History ---
 print(f"Loading config from {config_path}")
@@ -119,6 +117,15 @@ pdf_header_font = config.get('pdf_header_font', pdf_font) # Default to main font
 pdf_code_font = config.get('pdf_code_font', 'Noto Sans Mono') # Good default
 odt_reference_doc = config.get('pdf_odt_reference_doc') # Path to a reference ODT file
 
+# Define common pandoc PDF options to reduce duplication
+common_pdf_options = [
+    '--pdf-engine=xelatex',
+    '--variable', f"mainfont='{pdf_font}'",
+    '--variable', f"sansfont='{pdf_header_font}'",
+    '--variable', f"monofont='{pdf_code_font}'"
+]
+
+
 for policy_item in POLICY_FILES_LIST:
     try:
         policy_filename = policy_item['source']
@@ -166,32 +173,33 @@ for policy_item in POLICY_FILES_LIST:
         with open(md_path, 'w') as out_f:
             out_f.write(md_content)
 
-        # 6. Create Individual PDF
+        # --- Create Individual PDF ---
         pdf_filename = rendered_filename.replace('.md', '.pdf')
-        pdf_path = os.path.join(pdf_output_dir, pdf_filename)
+        pdf_path = os.path.join(dirs_to_create[1], pdf_filename)
         
         print(f"  -> Converting to individual PDF: {pdf_path}")
         
         pandoc_cmd_individual = [
             'pandoc',
             '--from=gfm', # Use GitHub Flavored Markdown (fixes bullets)
-            '--pdf-engine=xelatex', # Use xelatex for better font support
             '-o', pdf_path,
             '--metadata', f"title={rendered_title}", # Use friendly title
-            '--variable', f"mainfont={pdf_font}",
-            '--variable', f"sansfont={pdf_header_font}", # Set header font
-            '--variable', f"monofont={pdf_code_font}"  # Set code font
-        ]
+        ] + common_pdf_options
         
-        subprocess.run(
-            pandoc_cmd_individual,
-            input=pdf_content.encode('utf-8'),
-            check=True
-        )
+        try:
+            subprocess.run(
+                pandoc_cmd_individual,
+                input=pdf_content.encode('utf-8'),
+                check=True, capture_output=True, text=True
+            )
+        except subprocess.CalledProcessError as e:
+            print(f"ERROR: Pandoc failed to create individual PDF for {policy_filename}.")
+            print(f"Pandoc stderr:\n{e.stderr}")
+            exit(1)
         
         # 7. Create Individual ODT
         odt_filename = rendered_filename.replace('.md', '.odt')
-        odt_path = os.path.join(odt_output_dir, odt_filename)
+        odt_path = os.path.join(dirs_to_create[2], odt_filename)
         
         print(f"  -> Converting to individual ODT: {odt_path}")
         
@@ -206,10 +214,16 @@ for policy_item in POLICY_FILES_LIST:
         if odt_reference_doc and os.path.exists(odt_reference_doc):
             pandoc_cmd_odt.extend(['--reference-doc', odt_reference_doc])
 
-        subprocess.run(pandoc_cmd_odt, input=pdf_content.encode('utf-8'), check=True)
+        try:
+            subprocess.run(pandoc_cmd_odt, input=pdf_content.encode('utf-8'), check=True, capture_output=True, text=True)
+        except subprocess.CalledProcessError as e:
+            print(f"ERROR: Pandoc failed to create individual ODT for {policy_filename}.")
+            print(f"Pandoc stderr:\n{e.stderr}")
+            exit(1)
+
         
         # 7. Save file for Combined PDF
-        temp_combined_path = os.path.join(temp_combined_dir, rendered_filename)
+        temp_combined_path = os.path.join(dirs_to_create[3], rendered_filename)
         with open(temp_combined_path, 'w') as out_f:
             out_f.write(combined_content)
         processed_for_combined_pdf.append(temp_combined_path)
@@ -220,7 +234,7 @@ for policy_item in POLICY_FILES_LIST:
         exit(1)
 
 # --- 8. Create Final Combined PDF ---
-combined_pdf_path = os.path.join(pdf_output_dir, 'combined_policies.pdf')
+combined_pdf_path = os.path.join(dirs_to_create[1], 'combined_policies.pdf')
 print(f"Creating combined PDF: {combined_pdf_path}")
 
 combined_pdf_title = config.get('combined_pdf_title', 'Company Policy Manual')
@@ -230,22 +244,23 @@ try:
     pandoc_cmd_combined = [
         'pandoc',
         '--from=gfm', # Use GitHub Flavored Markdown (fixes bullets)
-        '--pdf-engine=xelatex', # Use xelatex for better font support
         '-o', combined_pdf_path,
         '--table-of-contents',
         '--toc-depth=2',
         '--number-sections',
         '--metadata', f"title={combined_pdf_title}",
         '--metadata', f"author={combined_pdf_author}",
-        '--variable', f"mainfont={pdf_font}",
-        '--variable', f"sansfont={pdf_header_font}",
-        '--variable', f"monofont={pdf_code_font}"
-    ] + processed_for_combined_pdf
+    ] + common_pdf_options + processed_for_combined_pdf
     
-    subprocess.run(pandoc_cmd_combined, check=True)
+    try:
+        subprocess.run(pandoc_cmd_combined, check=True, capture_output=True, text=True)
+    except subprocess.CalledProcessError as e:
+        print("ERROR: Pandoc failed to create the combined PDF.")
+        print(f"Pandoc stderr:\n{e.stderr}")
+        exit(1)
     
 except Exception as e:
-    print(f"ERROR creating combined PDF: {e}")
+    print(f"An unexpected error occurred during the combined PDF creation: {e}")
     exit(1)
 
 print("Policy build process completed successfully.")
