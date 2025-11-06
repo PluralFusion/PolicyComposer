@@ -189,7 +189,7 @@ for policy_item in POLICY_FILES_LIST:
         try:
             subprocess.run(
                 pandoc_cmd_individual,
-                input=pdf_content.encode('utf-8'),
+                input=pdf_content,
                 check=True, capture_output=True, text=True
             )
         except subprocess.CalledProcessError as e:
@@ -215,7 +215,7 @@ for policy_item in POLICY_FILES_LIST:
             pandoc_cmd_odt.extend(['--reference-doc', odt_reference_doc])
 
         try:
-            subprocess.run(pandoc_cmd_odt, input=pdf_content.encode('utf-8'), check=True, capture_output=True, text=True)
+            subprocess.run(pandoc_cmd_odt, input=pdf_content, check=True, capture_output=True, text=True)
         except subprocess.CalledProcessError as e:
             print(f"ERROR: Pandoc failed to create individual ODT for {policy_filename}.")
             print(f"Pandoc stderr:\n{e.stderr}")
