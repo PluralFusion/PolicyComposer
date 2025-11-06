@@ -175,6 +175,7 @@ for policy_item in POLICY_FILES_LIST:
         pandoc_cmd_individual = [
             'pandoc',
             '--from=gfm', # Use GitHub Flavored Markdown (fixes bullets)
+            '--pdf-engine=xelatex', # Use xelatex for better font support
             '-o', pdf_path,
             '--metadata', f"title={rendered_title}", # Use friendly title
             '--variable', f"mainfont={pdf_font}",
@@ -229,6 +230,7 @@ try:
     pandoc_cmd_combined = [
         'pandoc',
         '--from=gfm', # Use GitHub Flavored Markdown (fixes bullets)
+        '--pdf-engine=xelatex', # Use xelatex for better font support
         '-o', combined_pdf_path,
         '--table-of-contents',
         '--toc-depth=2',
