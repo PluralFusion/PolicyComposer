@@ -169,7 +169,7 @@ for policy_item in POLICY_FILES_LIST:
             combined_content += history_table
 
         # 5. Save Processed Markdown
-        md_path = os.path.join(md_output_dir, rendered_filename)
+        md_path = os.path.join(dirs_to_create[0], rendered_filename)
         with open(md_path, 'w') as out_f:
             out_f.write(md_content)
 
