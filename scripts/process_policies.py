@@ -120,9 +120,9 @@ odt_reference_doc = config.get('pdf_odt_reference_doc') # Path to a reference OD
 # Define common pandoc PDF options to reduce duplication
 common_pdf_options = [
     '--pdf-engine=xelatex',
-    '--variable', f"mainfont='{pdf_font}'",
-    '--variable', f"sansfont='{pdf_header_font}'",
-    '--variable', f"monofont='{pdf_code_font}'"
+    '--variable', f"mainfont={pdf_font}",
+    '--variable', f"sansfont={pdf_header_font}",
+    '--variable', f"monofont={pdf_code_font}"
 ]
 
 
