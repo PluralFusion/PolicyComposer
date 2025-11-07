@@ -1,10 +1,8 @@
 # Introduction
-
 {{ company_name }} ("{{ company }}") is committed to ensuring the confidentiality, privacy, integrity, and availability of all electronic protected health information (ePHI) it receives, maintains, processes and/or transmits on behalf of its Customers. As providers of compliant, {{ company_service }} used by {{ company_service_user_types }}, {{ company }} strives to maintain compliance, proactively address information security, mitigate risk for its Customers, and assure known breaches are completely and effectively communicated in a timely manner.
 
 {% if service_types.paas.enabled %}
 ## Platform as a Service (PaaS)
-
 PaaS Customers utilized hosted software and infrastructure from {{ company }} to deploy, host, and scale custom developed applications and configured databases. These customers are deployed into compliant containers run on systems secured and managed by {{ company }}. {{ company }} does not have insight or access into application level data of PaaS Customers and, as such, does not have the ability to secure or manage risk associated with application level vulnerabilities and security weaknesses. {{ company }} makes every effort to reduce the risk of unauthorized disclosure, access, and/or breach of PaaS Customer data through network (firewalls, dedicated IP spaces, etc) and server settings (encryption at rest and in transit, OSSEC throughout the Platform, etc).
 {% endif %}
 

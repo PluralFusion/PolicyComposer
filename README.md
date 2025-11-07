@@ -10,16 +10,6 @@ We are currently using this to update our own HIPAA documentation so our focus i
 ### Contributions Welcome
 If you enjoy playing with Jinja2, canonicalization, or have document templates to contribute, **please  contribute or file an issue**.
 
-## Table of Contents
-- [Why Use PolicyComposer?](#why-use-policycomposer)
-- [Workflow Overview](#workflow-overview)
-- [Quick Start](#quick-start)
-- [Detailed User Guide](/docs/UserGuide.md)
-- [Configuration Details (`conf/config.yaml`)](#configuration-overview)
-- [How Version History Works](#how-version-history-works)
-- [Template Documentation](#template-documentation)
-- [Attribution & License](#attribution--license)
-
 ## Why Use PolicyComposer?
 Managing company policies in traditional word processors can be a nightmare. PolicyComposer solves this by treating your policies like code.
 
@@ -29,21 +19,10 @@ Managing company policies in traditional word processors can be a nightmare. Pol
 -   **Customizable & Professional:** Use Pandoc and LaTeX to generate clean, professional PDFs. Customize fonts, titles, and authors easily.
 -   **Secure by Design:** Designed to be used in a private repository, ensuring your sensitive company information remains confidential.
 
-## Workflow Overview
-
-```mermaid
-graph TD
-    A[1. Edit `conf/config.yaml` and policy files] --> B{2. Push to GitHub};
-    B --> C{3. GitHub Action is triggered};
-    C --> D[4. Generates MD & PDF files];
-    D --> E[5. Download Artifacts files];
-```
-
-
 ## How to Use This Project
 
 ### Quick Start
-For details on how to get this up and running, visit the [**User Guide**](docs/UserGuide..md) documentation. 
+For details on how to get this up and running, visit the [**User Guide**](docs/UserGuide.md) documentation. 
 1.  **Create a new PRIVATE repository** on GitHub from this template.
 2.  Clone your new repository to your local machine.
 3.  Copy `conf/config-example.yaml` to `conf/config.yaml` and fill in your company's details.
@@ -56,7 +35,7 @@ For details on how to get this up and running, visit the [**User Guide**](docs/U
 The markdown documents are formatted to be updated based on changes to the \`conf/config.yaml\` file. 
 
 - **Templating:** For a detailed guide on using Jinja2 logic (if, for, etc.), see [docs/templating_guide.md](docs/templating_guide.md).
-- **Config Validation:** This project includes a powerful validation script to check your `config.yaml` for correctness, consistency, and completeness before you commit your changes. It can catch typos in variable names used in your templates, structural errors in your vendor list, and other common issues. See docs/CONFIG_VALIDATION.md for full details.
+- **Config Validation:** This project includes a validation script to check your `config.yaml` for correctness, consistency, and completeness before you commit your changes. It can catch typos in variable names used in your templates, structural errors in your vendor list, and other common issues. See the [Config Validation Doc](docs/CONFIG_VALIDATION.md) for full details.
 
 ## Attribution & License 
 ### AI-Assisted Development

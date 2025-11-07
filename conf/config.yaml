@@ -34,7 +34,7 @@ review_committee:
 # Service Types Offered by the Company
 service_types:
   saas:
-    enabled: true
+    enabled: false
     phi_access: true
     data_isolation: true
     api_security: true
