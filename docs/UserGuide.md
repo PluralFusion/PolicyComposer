@@ -36,19 +36,25 @@ This is the easiest and most reliable method. You will use GitHub to do all the 
 
 **IMPORTANT: To protect your company's sensitive configuration data, you must use a PRIVATE GitHub repository.**
 
-#### Step 1: Create Your Private Repository
-1.  Navigate to the PolicyComposer template page.
-2.  Select an owner for the new repository.
-3.  Choose a name for your repository (e.g., `my-company-policies`).
-4.  **Crucially, select `Private` for the visibility.**
-5.  Click **"Create repository from template"**.
+#### Step 1: Create Your Private Repository from the Template
 
+1.  Navigate to the [PolicyComposer repository on GitHub](https://github.com/PluralFusion/PolicyComposer).
+2.  Click the green **"Use this template"** button.
+3.  Select **"Create a new repository"**.
+4.  Choose an owner and give your new repository a name (e.g., `my-company-policies`).
+5.  **IMPORTANT: select `Private` for the visibility.** This is essential to protect your company's sensitive configuration data.
+6.  Ensure **"Include all branches"** is checked.
+7.  Click **"Create repository from template"**.
+
+GitHub will create a new private repository for you, containing a copy of all the files from the template.
+
+ 
 #### Step 2: Clone Your New Repository
 On your local machine, open a terminal and clone the new private repository you just created.
 ```bash
-# Replace YOUR-USERNAME and YOUR-PRIVATE-REPO.git with your details
-git clone https://github.com/YOUR-USERNAME/YOUR-PRIVATE-REPO.git
-cd YOUR-PRIVATE-REPO
+# Replace with your details
+git clone https://github.com/YOUR-USERNAME/YOUR-NEW-REPO.git
+cd YOUR-NEW-REPO
 ```
 
 #### Step 3: Configure Your Policies
