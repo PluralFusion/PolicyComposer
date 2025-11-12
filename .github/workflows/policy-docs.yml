@@ -52,9 +52,13 @@ jobs:
           # Use '|| true' to prevent failure on first commit (no HEAD~1)
           if git diff --name-only HEAD~1 HEAD 2>/dev/null | grep -q "conf/config.yaml"; then
             echo "conf/config.yaml was changed in the last commit."
+          # This robustly checks for changes across all commits in a push.
+          if git diff --name-only ${{ github.event.before }} ${{ github.event.after }} 2>/dev/null | grep -q "conf/config.yaml"; then
+            echo "conf/config.yaml was changed in this push."
             
             # Get old and new version values from git
             OLD_VERSION=$(git show HEAD~1:conf/config.yaml 2>/dev/null | grep 'release_version:' | awk '{print $2}' | tr -d '"' || echo "none")
+            OLD_VERSION=$(git show ${{ github.event.before }}:conf/config.yaml 2>/dev/null | grep 'release_version:' | awk '{print $2}' | tr -d '"' || echo "none")
             NEW_VERSION=$(grep 'release_version:' conf/config.yaml | awk '{print $2}' | tr -d '"')
             
             if [ "$OLD_VERSION" != "$NEW_VERSION" ] && [ -n "$NEW_VERSION" ]; then
@@ -65,6 +69,7 @@ jobs:
             fi
           else
             echo "config.yaml was not changed. This is not a global release."
+            echo "config.yaml was not changed in this push. This is not a global release."
           fi
           
           # --- This is the corrected syntax ---
